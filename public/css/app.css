@@ -1,0 +1,129 @@
+/* ---------------------------------------------------------------------- */
+/* --- 1. Global Font/Body Adjustment --- */
+/* ---------------------------------------------------------------------- */
+body {
+    font-family: 'Nunito', sans-serif;
+}
+
+/* ---------------------------------------------------------------------- */
+/* --- 2. Top Black Banner --- */
+/* ---------------------------------------------------------------------- */
+.top-banner {
+    background-color: #000;
+    color: #fff;
+    font-size: 0.75rem;
+    padding: 0.5rem 0;
+    height: 48px;
+    display: flex;
+    align-items: center;
+}
+
+.top-banner a {
+    font-weight: 600;
+}
+
+/* ---------------------------------------------------------------------- */
+/* --- 3. Main Navigation --- */
+/* ---------------------------------------------------------------------- */
+.main-navbar {
+    padding-top: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+/* Logo Style */
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+/* Center Navigation Links */
+.main-nav .nav-link {
+    color: #000 !important;
+    font-weight: 500;
+    margin: 0 1rem;
+    padding: 0.25rem 0;
+    position: relative;
+}
+
+/* Active Link Underline */
+.main-nav .nav-link.active::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    width: 100%;
+    height: 2px;
+    background-color: #db4444;
+}
+
+/* Search Input Style */
+.search-container {
+    position: relative;
+}
+
+.search-input {
+    width: 240px;
+    background-color: #f5f5f5;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    height: 38px;
+    padding-left: 1rem;
+    padding-right: 2.5rem;
+}
+
+.search-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #000;
+    cursor: pointer;
+}
+
+/* Icons Group Style (Heart, Cart, User) */
+.icon-link {
+    color: #000;
+    text-decoration: none;
+    font-size: 1.25rem;
+    margin-left: 1.25rem;
+}
+
+/* User Avatar */
+.user-avatar-icon {
+    font-size: 1rem;
+    color: #fff;
+    background-color: #DB4444;
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+/* User Dropdown Menu Styling */
+.user-dropdown-menu {
+    border-radius: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    min-width: 200px;
+    padding: 0.5rem 0;
+}
+
+.user-dropdown-menu .dropdown-item {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    color: #000;
+}
+
+.user-dropdown-menu .dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+.user-dropdown-menu .dropdown-item i {
+    width: 20px;
+    margin-right: 0.5rem;
+    color: #000;
+}
