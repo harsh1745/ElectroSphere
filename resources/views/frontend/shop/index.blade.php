@@ -135,6 +135,11 @@
         font-size: 0.9rem;
     }
 
+    .filter-sidebar {
+        max-width: 300px;
+        margin-right: 20px;
+    }
+
     .filter-link:hover,
     .filter-link.active {
         color: #DB4444;
@@ -178,7 +183,7 @@
             <p class="breadcrumb-text">
                 <a href="{{ route('home') }}" class="text-muted text-decoration-none">Home</a> / Shop
             </p>
-            <h1 class="shop-heading">SHOP WITH US</h1>
+            <h1 class="shop-heading">SHOP WITH US.</h1>
             <p class="text-muted">
                 Showing {{ $products->firstItem() }}–{{ $products->lastItem() }} of {{ $products->total() }} results
             </p>
@@ -188,51 +193,62 @@
     <div class="row">
 
         {{-- 1. LEFT SIDEBAR: FILTERS --}}
-        <div class="col-lg-3 col-md-4">
+        <div class="col-lg-3 col-md-4 filter-sidebar">
+                <form method="GET" action="{{ route('shop.index') }}" class="border p-3 rounded shadow-sm mb-4 bg-white">
+                <h5 class="mb-3 text-uppercase fw-bold">Filter Products</h5>
 
-            <form action="{{ route('shop.index') }}" method="GET">
-                {{-- Hidden input to maintain search/other filters on category change --}}
-                @foreach(request()->except(['category', 'page']) as $key => $value)
-                @if(!empty($value))
-                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
-                @endif
-                @endforeach
-
-                {{-- Category Filter (Image mein dropdown jaisa hai) --}}
-                <div class="filter-section">
-                    <h5>Categories</h5>
-                    <select name="category" onchange="this.form.submit()" class="form-select form-select-sm">
-                        <option value="">All Categories</option>
-                        @foreach($categories as $category)
-                        <option value="{{ $category->slug }}"
-                            {{ request('category') == $category->slug ? 'selected' : '' }}>
+                <!-- Category Filter -->
+                <div class="mb-3">
+                    <label for="category" class="form-label fw-semibold">Category</label>
+                    <select name="category" id="category" class="form-select">
+                        <option value="all" {{ empty($currentCategory) || $currentCategory == 'all' ? 'selected' : '' }}>All Categories</option>
+                        @foreach ($categories as $category)
+                        <option value="{{ $category->id }}" {{ $currentCategory == $category->id ? 'selected' : '' }}>
                             {{ $category->name }}
                         </option>
                         @endforeach
                     </select>
                 </div>
 
-                {{-- Price Filter (Example Filter) --}}
-                <div class="filter-section">
-                    <h5>Price Range</h5>
-                    <div class="mb-2">
-                        <input type="number" name="min_price" placeholder="Min Price" class="form-control form-control-sm" value="{{ request('min_price') }}">
+                <!-- Price Range Filter -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Price Range ($)</label>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <input type="number"
+                                name="min_price"
+                                class="form-control"
+                                placeholder="Min"
+                                value="{{ $minPrice ?? $priceRange['min'] }}"
+                                min="{{ $priceRange['min'] }}"
+                                max="{{ $priceRange['max'] }}">
+                        </div>
+                        <div class="col-6">
+                            <input type="number"
+                                name="max_price"
+                                class="form-control"
+                                placeholder="Max"
+                                value="{{ $maxPrice ?? $priceRange['max'] }}"
+                                min="{{ $priceRange['min'] }}"
+                                max="{{ $priceRange['max'] }}">
+                        </div>
                     </div>
-                    <div class="mb-2">
-                        <input type="number" name="max_price" placeholder="Max Price" class="form-control form-control-sm" value="{{ request('max_price') }}">
-                    </div>
-                    <button type="submit" class="btn btn-sm btn-dark w-100">Apply Filter</button>
                 </div>
 
-                <!-- {{-- Type Filter (Static Example) --}}
-                <div class="filter-section">
-                    <h5>Type</h5>
-                    <a href="#" class="filter-link active">Knitted Jumper</a>
-                    <a href="#" class="filter-link">Cotton Shirt</a>
-                    <a href="#" class="filter-link">Denim Jeans</a>
-                </div> -->
+                <!-- Apply & Reset Buttons -->
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-dark">
+                        <i class="bi bi-funnel-fill me-1"></i> Apply Filter
+                    </button>
 
+                    @if(request()->has('category') || request()->has('min_price') || request()->has('max_price'))
+                    <a href="{{ route('shop.index') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-counterclockwise me-1"></i> Reset Filter
+                    </a>
+                    @endif
+                </div>
             </form>
+
         </div>
 
         {{-- 2. RIGHT CONTENT: PRODUCT GRID --}}
@@ -243,7 +259,7 @@
                 @php
                 $isSlugValid = !empty($product->slug);
                 $productLink = $isSlugValid ? route('shop.show', ['slug' => $product->slug]) : route('shop.index');
-                $placeholderUrl = 'https://via.placeholder.com/250x250?text=No+Image';
+                $placeholderUrl = 'https://via.placeholder.com/250x250/E0E0E0/333333?text=No+Image';
 
                 // ✅ FIXED IMAGE URL (storage/products/filename.jpg)
                 $imageSource = (!empty($product->image))
@@ -351,4 +367,21 @@
 
 @push('scripts')
 {{-- Agar koi JS zaroori ho toh yahan add karein --}}
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const select = document.querySelector('select[name="category"]');
+        select.addEventListener('change', () => {
+            if (select.value === '') {
+                const url = new URL(window.location.href);
+                url.searchParams.delete('category');
+                window.location.href = url.toString();
+            } else {
+                select.form.submit();
+            }
+        });
+    });
+</script>
+
+
 @endpush

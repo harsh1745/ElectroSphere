@@ -2,29 +2,26 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Model; // Base model
+use App\Models\Category; // <-- 💥 FIX: Yeh line zaroori hai aur iska path sahi hona chahiye
 
 class Product extends Model
 {
-    use HasFactory;
-
-    /**
-     * The attributes that are mass assignable.
-     * Database schema: category_id, name, description, price, image
-     */
     protected $fillable = [
         'name',
-        'category_id',
+        'slug', // Agar tum slug use karte ho
+        'category_id', 
         'price',
         'description',
         'image',
-        // 'created_at' and 'updated_at' are handled automatically by Laravel
     ];
 
-    // Agar tum 'category_id' ko Foreign Key relation se link karna chaho toh:
-    // public function category()
-    // {
-    //     return $this->belongsTo(Category::class);
-    // }
+    // Category Relationship (Jo ShopController mein use ho raha hai)
+    public function category()
+    {
+        // Category model ko use karne ke liye, upar 'use App\Models\Category;' hona chahiye.
+        return $this->belongsTo(Category::class, 'category_id', 'id');
+    }
+    
+    // ... baaki methods ...
 }

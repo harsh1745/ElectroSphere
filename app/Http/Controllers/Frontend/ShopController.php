@@ -2,43 +2,60 @@
 
 namespace App\Http\Controllers\Frontend;
 
-use App\Http\Controllers\Controller; // ⬅️ FIX: Base Controller import
-use Illuminate\Http\Request;         // ⬅️ FIX: Request class import
-use App\Models\Product;              // ⬅️ FIX: Product Model import
-use App\Models\Category;             // ⬅️ FIX: Category Model import
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\Product;
+use App\Models\Category;
 
 class ShopController extends Controller
 {
     public function index(Request $request)
     {
-        // Fetch all categories to display in the sidebar/filter
         $categories = Category::all();
+        $productsQuery = Product::query();
 
-        // Start with all products
-        $products = Product::query();
+        // Get filters
+        $currentCategory = $request->input('category'); // category id
+        $minPrice = $request->input('min_price');
+        $maxPrice = $request->input('max_price');
 
-        // Apply category filter if selected
-        if ($request->has('category') && $request->category != '') {
-            // Note: Make sure 'category' relationship exists on Product model
-            $products->whereHas('category', function ($query) use ($request) {
-                $query->where('slug', $request->category);
+        // 🧩 Category filter
+        if (!empty($currentCategory) && $currentCategory !== 'all') {
+            $productsQuery->whereHas('category', function ($query) use ($currentCategory) {
+                $query->where('id', $currentCategory);
             });
         }
 
-        // Apply other filters (search example)
-        if ($request->has('search') && $request->search != '') {
-            $products->where('name', 'like', '%' . $request->search . '%');
+        // 🧩 Price Range filter
+        if (!empty($minPrice)) {
+            $productsQuery->where('price', '>=', $minPrice);
         }
 
-        // Paginate the results
-        $products = $products->paginate(9);
+        if (!empty($maxPrice)) {
+            $productsQuery->where('price', '<=', $maxPrice);
+        }
 
-        return view('frontend.shop.index', compact('products', 'categories'));
+        // 🧩 Get products (paginate)
+        $products = $productsQuery->paginate(9)->withQueryString();
+
+        // 🧩 Get min & max product price for slider
+        $priceRange = [
+            'min' => Product::min('price'),
+            'max' => Product::max('price')
+        ];
+
+        return view('frontend.shop.index', compact(
+            'products',
+            'categories',
+            'currentCategory',
+            'minPrice',
+            'maxPrice',
+            'priceRange'
+        ));
     }
 
     public function show($slug)
     {
-        // Product Model use ho raha hai
         $product = Product::where('slug', $slug)->firstOrFail();
         return view('frontend.shop.show', compact('product'));
     }
