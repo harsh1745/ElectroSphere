@@ -153,4 +153,3 @@ Route::prefix('shop')->name('shop.')->group(function () {
     Route::get('/', [ShopController::class, 'index'])->name('index');
     Route::get('/{slug}', [ShopController::class, 'show'])->name('show');
 });
-
