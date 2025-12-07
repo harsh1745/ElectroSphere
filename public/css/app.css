@@ -127,3 +127,65 @@ body {
     margin-right: 0.5rem;
     color: #000;
 }
+
+.main-nav .nav-link {
+    position: relative;
+    padding-bottom: 0.5rem !important;
+    /* Thodi space bottom mein */
+}
+
+/* Default link color */
+.main-nav .nav-link:not(.active) {
+    color: #333 !important;
+}
+
+/* Active link color aur bottom red line */
+.main-nav .nav-link.active {
+    color: #DB4444 !important;
+    /* Red link text */
+    font-weight: 600;
+}
+
+/* Red bottom line effect */
+.main-nav .nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    /* Width of the red line */
+    height: 2px;
+    background-color: #DB4444;
+    /* Red color */
+    border-radius: 2px;
+}
+
+/* Ensure the search bar does not move links */
+.main-nav {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.fade-out {
+    opacity: 0;
+    transition: opacity 0.4s ease-out;
+}
+
+/* Smooth fade-in */
+.fade-in {
+    opacity: 0;
+    animation: fadeInAnim 0.5s forwards ease-out;
+}
+
+@keyframes fadeInAnim {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0px);
+    }
+}

@@ -1,6 +1,7 @@
 @extends('admin.layouts.admin')
 
 @section('content')
+<x-admin.back />
 
 <h1>Add New Product</h1>
 <p>Fill in the details to add a new product to the catalog.</p>
@@ -35,6 +36,22 @@
         @error('price') <span class="error-message">{{ $message }}</span> @enderror
     </div>
 
+    {{-- ✅ NEW FIELDS ADDED --}}
+    {{-- ✅ NEW: Stock Quantity Input --}}
+    <div class="form-group">
+        <label for="stock">Stock Quantity (Units):</label>
+        <input type="number" id="stock" name="stock" min="0"
+            class="webflow-input" value="{{ old('stock', 0) }}" required>
+        @error('stock') <span class="error-message">{{ $message }}</span> @enderror
+    </div>
+
+    <div class="form-group">
+        <label for="manufacturer">Manufacturer:</label>
+        <input type="text" id="manufacturer" name="manufacturer"
+            class="webflow-input" value="{{ old('manufacturer') }}" placeholder="e.g., Nike, Samsung">
+        @error('manufacturer') <span class="error-message">{{ $message }}</span> @enderror
+    </div>
+
     <div class="form-group">
         <label for="description">Description:</label>
         <textarea id="description" name="description" class="webflow-textarea">{{ old('description') }}</textarea>
@@ -45,6 +62,7 @@
         <input type="file" id="image" name="image" class="webflow-file-input">
         @error('image') <span class="error-message">{{ $message }}</span> @enderror
     </div>
+
 
     <button type="submit" id="submit-product" class="webflow-submit-button">Add Product</button>
 </form>

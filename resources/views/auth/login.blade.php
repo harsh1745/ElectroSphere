@@ -174,9 +174,7 @@
                 Please ensure your image is located at: 
                 public/images/login.jpeg 
             -->
-            <img src="{{ asset('images/login.jpeg') }}"
-                alt="Exclusive Shopping Banner"
-                class="img-fluid"
+            <img src="{{ asset('images/login.jpeg') }}" alt="Exclusive Shopping Banner" class="img-fluid"
                 onerror="this.onerror=null;this.style.display='none';"
                 style="height: 100%; width: 100%; object-fit: contain; background:white;">
         </div>
@@ -192,8 +190,8 @@
 
                 <!-- Email or Phone Field -->
                 <div class="mb-3">
-                    <input id="email" type="text" class="form-control @error('email') is-invalid @enderror"
-                        name="email" value="{{ old('email') }}" required autocomplete="email" autofocus
+                    <input id="email" type="text" class="form-control @error('email') is-invalid @enderror" name="email"
+                        value="{{ old('email') }}" required autocomplete="email" autofocus
                         placeholder="Email or Phone Number">
 
                     @error('email')
@@ -206,8 +204,7 @@
                 <!-- Password Field -->
                 <div class="mb-3">
                     <input id="password" type="password" class="form-control @error('password') is-invalid @enderror"
-                        name="password" required autocomplete="current-password"
-                        placeholder="Password">
+                        name="password" required autocomplete="current-password" placeholder="Password">
 
                     @error('password')
                     <span class="invalid-feedback" role="alert">

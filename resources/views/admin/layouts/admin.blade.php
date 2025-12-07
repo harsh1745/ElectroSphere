@@ -97,7 +97,7 @@
                 </a>
 
                 {{-- 4. Orders --}}
-                <a href="#" class="list-group-item list-group-item-action">
+                <a href="{{ route('admin.orders.index') }}" class="list-group-item list-group-item-action">
                     Orders
                 </a>
 
@@ -136,8 +136,57 @@
             </div>
         </div>
     </div>
+
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+        <div id="adminSuccessToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-success text-white">
+                <i class="fas fa-check-circle me-2"></i>
+                <strong class="me-auto">Success</strong>
+                <small class="text-white">Just Now</small>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body text-dark" id="adminToastBody">
+            </div>
+        </div>
+    </div>
     <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('js/sweetalert.js') }}"></script>
+
     @stack('scripts')
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // ✅ FIX 1: 'admin_toast' key ko read karein (jo controller bhej raha hai)
+            const successMessage = "{{ session('admin_toast') }}";
+
+            // Agar aapko general error bhi handle karna hai:
+            const errorMessage = "{{ session('error') }}";
+
+            // --- Handle Success Toast/SweetAlert ---
+            if (successMessage.trim().length > 0 && typeof Swal !== 'undefined') {
+                // SweetAlert Display
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: successMessage,
+                    showConfirmButton: false,
+                    timer: 2500,
+                    confirmButtonColor: '#4CAF50'
+                });
+            }
+
+            // --- Handle Error Alert ---
+            if (errorMessage.trim().length > 0 && typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Operation Failed!',
+                    text: errorMessage,
+                    confirmButtonColor: '#DB4444'
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>

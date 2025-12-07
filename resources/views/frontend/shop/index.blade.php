@@ -1,179 +1,24 @@
 @extends('frontend.layouts.app')
 
 @section('title', 'Shop - Products')
+@push('styles')
+<link href="{{ asset('css/frontend/shop.css') }}" rel="stylesheet">
+@endpush
 
 @section('content')
+{{-- Wishlist Product IDs ko JavaScript ke liye JSON encode karo --}}
+@php
+$wishlistProductIds = $wishlistProductIds ?? [];
+$minPrice = $minPrice ?? '';
+$maxPrice = $maxPrice ?? '';
+@endphp
 
-<style>
-    /* Custom Styles for Shop Page UI */
-    .shop-heading {
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-    }
+{{-- Global data hooks for JavaScript to access Laravel variables --}}
+{{-- Yeh elements JavaScript ko CSRF token, Auth status, aur route URL provide karte hain --}}
+<div id="auth-status" data-is-auth="{!! Auth::check() ? 'true' : 'false' !!}" style="display: none;"></div>
+<div id="csrf-token-data" data-token="{!! csrf_token() !!}" style="display: none;"></div>
 
-    .breadcrumb-text {
-        font-size: 0.85rem;
-        color: #808080;
-    }
 
-    .product-card {
-        border: none;
-        border-radius: 0;
-        text-align: center;
-        transition: box-shadow 0.3s;
-    }
-
-    .product-card:hover {
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    .product-card-body {
-        padding: 1rem 0;
-    }
-
-    .product-image-wrapper {
-        background-color: #f5f5f5;
-        /* Light grey background jaisa image mein hai */
-        position: relative;
-        padding: 10px;
-        overflow: hidden;
-    }
-
-    .product-image-wrapper img {
-        height: 250px;
-        object-fit: contain;
-        width: 100%;
-        transition: opacity 0.3s;
-    }
-
-    /* Product Hover Overlay CSS */
-    .product-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.4);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        opacity: 0;
-        transition: opacity 0.3s;
-    }
-
-    .product-image-wrapper:hover .product-overlay {
-        opacity: 1;
-    }
-
-    .product-image-wrapper:hover img {
-        opacity: 0.8;
-    }
-
-    .wishlist-icon {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        z-index: 10;
-        color: #333;
-        background-color: white;
-        padding: 8px;
-        border-radius: 50%;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        cursor: pointer;
-        transition: color 0.3s;
-    }
-
-    .wishlist-icon:hover {
-        color: #DB4444;
-        /* Red hover effect */
-    }
-
-    .product-card .card-title {
-        font-size: 1rem;
-        font-weight: 500;
-        margin-bottom: 5px;
-        color: #333;
-    }
-
-    .product-card .card-price {
-        color: #DB4444;
-        /* Red accent for price */
-        font-weight: 700;
-        font-size: 1.1rem;
-    }
-
-    .star-rating i {
-        color: #FFAD33;
-        /* Gold/Orange for stars */
-        font-size: 0.9rem;
-    }
-
-    /* Filters Sidebar */
-    .filter-section {
-        margin-bottom: 30px;
-        padding-bottom: 15px;
-        border-bottom: 1px solid #e0e0e0;
-    }
-
-    .filter-section:last-child {
-        border-bottom: none;
-    }
-
-    .filter-section h5 {
-        font-size: 1rem;
-        font-weight: 600;
-        margin-bottom: 10px;
-        color: #333;
-    }
-
-    .filter-link {
-        color: #333;
-        text-decoration: none;
-        display: block;
-        margin-bottom: 5px;
-        font-size: 0.9rem;
-    }
-
-    .filter-sidebar {
-        max-width: 300px;
-        margin-right: 20px;
-    }
-
-    .filter-link:hover,
-    .filter-link.active {
-        color: #DB4444;
-        font-weight: 600;
-    }
-
-    /* Banners Section */
-    .banners-section img {
-        height: 350px;
-        object-fit: cover;
-        width: 100%;
-    }
-
-    /* Features Section */
-    .features-section {
-        background-color: #FAFAFA;
-        padding: 50px 0;
-    }
-
-    .feature-item {
-        text-align: center;
-    }
-
-    .feature-icon {
-        background-color: #212121;
-        color: white;
-        border-radius: 50%;
-        padding: 15px;
-        font-size: 1.5rem;
-        display: inline-block;
-        margin-bottom: 15px;
-        line-height: 1;
-    }
-</style>
 
 <div class="container my-5">
 
@@ -194,10 +39,9 @@
 
         {{-- 1. LEFT SIDEBAR: FILTERS --}}
         <div class="col-lg-3 col-md-4 filter-sidebar">
-                <form method="GET" action="{{ route('shop.index') }}" class="border p-3 rounded shadow-sm mb-4 bg-white">
+            <form method="GET" action="{{ route('shop.index') }}" class="border p-3 rounded shadow-sm mb-4 bg-white">
                 <h5 class="mb-3 text-uppercase fw-bold">Filter Products</h5>
 
-                <!-- Category Filter -->
                 <div class="mb-3">
                     <label for="category" class="form-label fw-semibold">Category</label>
                     <select name="category" id="category" class="form-select">
@@ -210,7 +54,6 @@
                     </select>
                 </div>
 
-                <!-- Price Range Filter -->
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Price Range ($)</label>
                     <div class="row g-2">
@@ -235,7 +78,6 @@
                     </div>
                 </div>
 
-                <!-- Apply & Reset Buttons -->
                 <div class="d-grid gap-2">
                     <button type="submit" class="btn btn-dark">
                         <i class="bi bi-funnel-fill me-1"></i> Apply Filter
@@ -253,87 +95,121 @@
 
         {{-- 2. RIGHT CONTENT: PRODUCT GRID --}}
         <div class="col-lg-9 col-md-8">
-            <div class="row">
-
+            <div class="row g-4">
                 @forelse($products as $product)
                 @php
                 $isSlugValid = !empty($product->slug);
                 $productLink = $isSlugValid ? route('shop.show', ['slug' => $product->slug]) : route('shop.index');
-                $placeholderUrl = 'https://via.placeholder.com/250x250/E0E0E0/333333?text=No+Image';
-
-                // ✅ FIXED IMAGE URL (storage/products/filename.jpg)
+                $placeholderUrl = 'https://via.placeholder.com/300x300/E0E0E0/333333?text=No+Image';
                 $imageSource = (!empty($product->image))
                 ? asset('storage/' . $product->image)
                 : $placeholderUrl;
+
+                // Check if current product is in the wishlist
+                $isWishlisted = in_array($product->id, $wishlistProductIds);
+
+                // Route URL template with product ID embedded
+                $wishlistRouteUrl = route('wishlist.toggle', ['product' => $product->id]);
+
+                // ✅ Stock Status Check
+                $statusKey = $product->stock_status ?? \App\Models\Product::STATUS_IN_STOCK;
+
+                $isAvailable = $statusKey !== \App\Models\Product::STATUS_NOT_AVAILABLE;
+
+                if ($statusKey === \App\Models\Product::STATUS_IN_STOCK) {
+                $statusBadge = 'bg-success';
+                $statusText = 'In Stock';
+                } elseif ($statusKey === \App\Models\Product::STATUS_LOW_STOCK) {
+                $statusBadge = 'bg-warning text-dark'; // Low Stock ke liye yellow badge
+                $statusText = 'Low Stock';
+                } else {
+                $statusBadge = 'bg-danger';
+                $statusText = 'Not Available';
+                }
                 @endphp
 
+                <div class="col-lg-4 col-md-6 col-sm-6">
+                    <div class="product-card shadow-sm">
+                        <div class="product-img position-relative overflow-hidden">
+                            {{-- Status Badge Display (Optional, but useful) --}}
+                            <span class="badge {{ $statusBadge }} position-absolute top-0 start-0 m-2 z-index-1">
+                                {{ $statusText }}
+                            </span>
+                            <img src="{{ $imageSource }}"
+                                onerror="this.onerror=null;this.src='{{ $placeholderUrl }}';"
+                                class="img-fluid w-100"
+                                alt="{{ $product->name }}">
 
-                <div class="col-lg-4 col-md-6 col-sm-6 mb-4">
-                    <div class="card product-card h-100">
-                        <a href="{{ $productLink }}" style="text-decoration: none; color: inherit;">
-                            <div class="product-image-wrapper">
-                                <img src="{{ $imageSource }}"
-                                    onerror="this.onerror=null;this.src='{{ $placeholderUrl }}';"
-                                    class="img-fluid"
-                                    alt="{{ $product->name }}">
-                                <i class="far fa-heart wishlist-icon"></i>
-
-                                <div class="product-overlay">
-                                    @if ($isSlugValid)
-                                    <button class="btn btn-danger btn-sm text-uppercase fw-bold"
-                                        onclick="window.location.href='{{ $productLink }}'; return false;">
-                                        View Product
-                                    </button>
-                                    @endif
-                                </div>
+                            {{-- WISHLIST ICON: ✅ FIX: @onclick ko 'onclick' se replace kiya aur sirf 'this' pass kiya --}}
+                            <div class="wishlist-icon"
+                                data-toggle-route="{{ route('wishlist.toggle', ['product' => $product->id]) }}"
+                                onclick="toggleWishlist(this)">
+                                <i class="wishlist-icon__heart {{ $isWishlisted ? 'fas is-wishlisted' : 'far' }} fa-heart"></i>
                             </div>
-                        </a>
-                        <div class="card-body product-card-body">
-                            <h6 class="card-title">{{ $product->name }}</h6>
+                            @php
+                            // ... (Placeholder URL aur baaki code) ...
+
+                            // Check if slug is valid
+                            $isSlugValid = !empty($product->slug);
+
+                            // ✅ FIX: Agar Slug valid nahi hai, toh Product ID use karke details page ka link banao
+                            $productLink = $isSlugValid
+                            ? route('shop.show', ['slug' => $product->slug])
+                            : (isset($product->id) ? route('shop.show', ['slug' => $product->id]) : route('shop.index')); // Fallback to index if no ID/Slug
+
+                            // Agar aapka shop.show route sirf slug leta hai, toh aapko ID ko slug ki jagah use karna hoga.
+                            // Assuming your shop.show route can handle either slug or ID being passed as 'slug':
+                            $productLink = route('shop.show', ['slug' => $product->slug ?? $product->id]);
+                            @endphp
+
+                            <div class="product-overlay d-flex flex-column justify-content-center align-items-center">
+                                <a href="{{ $productLink }}"
+                                    class="btn btn-light mb-2 text-uppercase fw-semibold">
+                                    <i class="fas fa-eye me-1"></i> View Details
+                                </a>
+                                {{-- ✅ ADD TO CART BUTTON CHECK --}}
+                                {{-- ✅ ADD TO CART BUTTON LOGIC --}}
+                                @if ($isAvailable)
+                                {{-- Button enabled for In Stock and Low Stock --}}
+                                <button class="btn btn-danger text-uppercase fw-semibold" onclick="addToCart(this)" data-route="{{ route('cart.add', ['product' => $product->id]) }}">
+                                    <i class="fas fa-shopping-cart me-1"></i> Add to Cart
+                                </button>
+                                @else
+                                {{-- Button disabled for Not Available --}}
+                                <button class="btn btn-secondary text-uppercase fw-semibold" disabled>
+                                    Not Available
+                                </button>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="product-info text-center p-3">
+                            <h6 class="product-name fw-semibold text-dark mb-2">{{ $product->name }}</h6>
                             <div class="star-rating mb-1">
                                 <i class="fas fa-star"></i><i class="fas fa-star"></i>
                                 <i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i><i class="far fa-star"></i>
                             </div>
-                            <p class="card-price">${{ number_format($product->price, 2) }}</p>
+                            <p class="product-price mb-0 text-danger fw-bold">${{ number_format($product->price, 2) }}</p>
                         </div>
                     </div>
                 </div>
 
                 @empty
                 <div class="col-12">
-                    <div class="alert alert-info text-center" role="alert">
+                    <div class="alert alert-info text-center">
                         No products found in this selection.
                     </div>
                 </div>
                 @endforelse
-
             </div>
 
-            {{-- Pagination Links --}}
             <div class="d-flex justify-content-center mt-4">
                 {{ $products->links() }}
             </div>
         </div>
+
     </div>
 </div>
 
-{{-- 3. BOTTOM BANNERS SECTION --}}
-<!-- <div class="container my-5 banners-section">
-    <div class="row g-4">
-        <div class="col-lg-3 col-md-6">
-            <img src="https://via.placeholder.com/280x350/E0E0E0/333333?text=Promotion+Banner+1" class="img-fluid rounded" alt="Promotion Banner 1">
-        </div>
-        <div class="col-lg-3 col-md-6">
-            <img src="https://via.placeholder.com/280x350/E0E0E0/333333?text=Promotion+Banner+2" class="img-fluid rounded" alt="Promotion Banner 2">
-        </div>
-        <div class="col-lg-3 col-md-6">
-            <img src="https://via.placeholder.com/280x350/E0E0E0/333333?text=Promotion+Banner+3" class="img-fluid rounded" alt="Promotion Banner 3">
-        </div>
-        <div class="col-lg-3 col-md-6">
-            <img src="https://via.placeholder.com/280x350/E0E0E0/333333?text=Promotion+Banner+4" class="img-fluid rounded" alt="Promotion+Banner+4">
-        </div>
-    </div>
-</div> -->
 
 {{-- 4. FEATURES SECTION --}}
 <div class="features-section">
@@ -366,7 +242,7 @@
 @endsection
 
 @push('scripts')
-{{-- Agar koi JS zaroori ho toh yahan add karein --}}
+<script src="{{ asset('js/shop.js') }}"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -382,6 +258,4 @@
         });
     });
 </script>
-
-
 @endpush

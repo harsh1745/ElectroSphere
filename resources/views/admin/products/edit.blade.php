@@ -3,6 +3,7 @@
 @extends('admin.layouts.admin')
 
 @section('content')
+    <x-admin.back />
 
 <h1>Edit Product: {{ $product->name }}</h1>
 
@@ -40,6 +41,22 @@
             value="{{ old('price', $product->price) }}" required>
         @error('price') <span class="error-message">{{ $message }}</span> @enderror
     </div>
+
+    {{-- ✅ NEW: Stock Quantity Input --}}
+    <div class="form-group">
+        <label for="stock">Stock Quantity (Units):</label>
+        <input type="number" id="stock" name="stock" min="0"
+            class="webflow-input" value="{{ old('stock', $product->stock ?? 0) }}" required>
+        @error('stock') <span class="error-message">{{ $message }}</span> @enderror
+    </div>
+
+    <div class="form-group">
+        <label for="manufacturer">Manufacturer:</label>
+        <input type="text" id="manufacturer" name="manufacturer"
+            value="{{ old('manufacturer', $product->manufacturer) }}" placeholder="e.g., Nike, Samsung">
+        @error('manufacturer') <span class="error-message">{{ $message }}</span> @enderror
+    </div>
+
 
     {{-- Description: Existing value load hogi --}}
     <div class="form-group">

@@ -3,6 +3,8 @@
 @extends('admin.layouts.admin')
 
 @section('content')
+    <x-admin.back />
+
 <h1>Customer Users</h1>
 
 {{-- Success/Warning Messages (from verification action) --}}

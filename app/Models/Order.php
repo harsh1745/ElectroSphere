@@ -10,51 +10,34 @@ class Order extends Model
     use HasFactory;
 
     /**
-     * The attributes that are mass assignable.
-     * Database schema: user_id, total_amount, status
+     * ✅ FIX: $fillable array ko aapke simple 'orders' table se match karein
      */
     protected $fillable = [
         'user_id',
         'total_amount',
-        'status',
-        // 'created_at' and 'updated_at' are handled automatically
+        'status', // Aapne confirm kiya ki 'status' column hai
+
+        // ✅ YEH SAARI FIELDS ZAROORI HAIN (Mass Assignment ke liye)
+        'address_id',
+        'order_number',
+        'subtotal',
+        'shipping_cost',
+        'payment_method',
+        'payment_status',   // ← NEW
+        'shipping_address_json',
     ];
 
-    /**
-     * The table associated with the model.
-     * Default name 'orders' hai, jo sahi hai.
-     * @var string
-     */
-    protected $table = 'orders';
-
-    /**
-     * Casts the 'status' enum to string (optional but good practice)
-     */
-    protected $casts = [
-        'total_amount' => 'decimal:2', // total_amount decimal(10,2) hai
-    ];
-
-    /*
-    |--------------------------------------------------------------------------
-    | Relationships
-    |--------------------------------------------------------------------------
-    */
-
-    /**
-     * Ek order ek user se belong karta hai (orders.user_id -> users.id).
-     */
+    // Relationships
     public function user()
     {
-        // Assuming your customer model is App\Models\User
         return $this->belongsTo(User::class);
     }
 
     /**
-     * Ek order mein bahut saare products ho sakte hain (order_details table ke through).
+     * Aapke table 'order_details' ke hisaab se relationship
      */
-    public function details()
+    public function items()
     {
-        // OrderDetails model (jo tum order_details table se banaoge) se link karta hai.
-        return $this->hasMany(OrderDetail::class); 
+        return $this->hasMany(OrderItem::class, 'order_id');
     }
 }

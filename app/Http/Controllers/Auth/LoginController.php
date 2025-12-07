@@ -43,6 +43,6 @@ class LoginController extends Controller
     protected function loggedOut(Request $request): ?RedirectResponse
     {
         // ✅ YEH CODE USER KO /home PAR BHEJEGA
-        return redirect('/home'); 
+        return redirect('/home');
     }
 }

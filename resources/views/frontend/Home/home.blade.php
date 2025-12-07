@@ -2,6 +2,9 @@
 
 @section('title', 'Home')
 
+{{-- ✅ FIX: YEH HIDDEN DIVS ZAROORI HAIN JAVASCRIPT KE LIYE --}}
+<div id="auth-status" data-is-auth="{!! Auth::check() ? 'true' : 'false' !!}" style="display: none;"></div>
+<div id="csrf-token-data" data-token="{!! csrf_token() !!}" style="display: none;"></div>
 @section('content')
 
 <!-- ==================================================================== -->
@@ -169,5 +172,5 @@
 @endpush
 
 @push('scripts')
-<!-- No custom JavaScript needed for static layout -->
+<script src="{{ asset('js/shop.js') }}"></script>
 @endpush

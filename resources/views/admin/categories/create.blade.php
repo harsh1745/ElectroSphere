@@ -3,6 +3,8 @@
 @extends('admin.layouts.admin') {{-- Tumhara master admin layout --}}
 
 @section('content')
+    <x-admin.back />
+
     <h1>Add New Category</h1>
     
     {{-- Success/Error Messages yahaan aayenge --}}
