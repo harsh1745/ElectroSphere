@@ -18,141 +18,286 @@ window.showErrorAlert = function (title, text) {
  * Toggles the product's presence in the user's wishlist via AJAX.
  * @param {HTMLElement} element - The clicked element.
  */
+// window.toggleWishlist = function (element) {
+
+//     if (!window.IS_AUTHENTICATED) {
+//         // alert('Please login to add products to wishlist!');
+//         // ➡️ ALERT REPLACED
+//         window.showErrorAlert('Login Required!', 'Please login to add products to wishlist.');
+//         return;
+//     }
+
+//     const isWishlistPage = window.location.pathname.includes('/wishlist');
+//     const isDrawerRemoveButton = element.classList.contains('remove-wishlist-drawer-btn');
+
+//     let url;
+//     let targetElement;
+
+//     // ✅ NEW: Product ID nikal lo, jo response handling mein kaam aayega
+//     const productId = element.dataset.itemId || (element.closest('.wishlist-icon') ? element.closest('.wishlist-icon').dataset.itemId : null);
+
+
+//     // --- Determine URL and the DOM element to manipulate ---
+
+
+
+//     if (isDrawerRemoveButton && targetElement) {
+//         targetElement.remove();
+//         const contentDiv = document.getElementById('wishlist-drawer-content');
+//         if (!contentDiv.querySelector('li')) {
+//             contentDiv.innerHTML = '<p class="text-muted text-center p-5">Aapki wishlist khaali hai!</p>';
+//         }
+//         document.getElementById('wishlist-subtotal').textContent = 'Rs. 0.00';
+//     }
+//     else if (isWishlistPage) {
+//         // Logic for main wishlist page (element is the remove button or the <tr>)
+//         const removeBtn = element.querySelector('.remove-wishlist-btn') || element.closest('td').querySelector('button');
+//         url = removeBtn ? removeBtn.dataset.toggleRoute : element.dataset.toggleRoute;
+//         targetElement = element.closest('tr') || element;
+//         // ✅ FIX: ADD THIS LINE TO REMOVE THE ROW
+//         if (targetElement) {
+//             targetElement.remove();
+//         }
+//     }
+//     else if (isDrawerRemoveButton) {
+//         // ✅ DRAWER LOGIC: Element is the <button>. 
+//         url = element.dataset.toggleRoute;
+//         targetElement = element.closest('li'); // The element to remove from the DOM
+//     }
+//     else {
+//         // Logic for Shop/Product Page Icon
+//         url = element.dataset.toggleRoute;
+//         targetElement = element;
+//     }
+
+//     if (!url) {
+//         // console.error("Toggle route not found.");
+//         // ➡️ ALERT REPLACED
+//         window.showErrorAlert('Configuration Error!', 'Toggle route not configured correctly.');
+//         return;
+//     }
+
+//     // 🔁 Send AJAX Request
+//     fetch(url, {
+//         method: 'POST',
+//         headers: {
+//             'X-CSRF-TOKEN': window.Laravel.csrfToken,
+//             'Accept': 'application/json',
+//             'Content-Type': 'application/json'
+//         },
+//     })
+//         .then(response => {
+//             if (response.status === 401) {
+//                 // alert('Session expired or unauthorized. Please login.');
+//                 // ➡️ ALERT REPLACED
+//                 window.showErrorAlert('Session Expired!', 'Session expired or unauthorized. Please login.');
+//                 return { status: 'error' };
+//             }
+//             return response.json();
+//         })
+//         .then(data => {
+
+//             if (data.status === 'added') {
+//                 if (!isWishlistPage && !isDrawerRemoveButton) {
+//                     // Shop/Product Page Icon Update
+//                     targetElement.querySelector('i').classList.add('is-wishlisted', 'fas');
+//                     targetElement.querySelector('i').classList.remove('far');
+//                 }
+//             }
+//             else if (data.status === 'removed') {
+
+//                 // --- 1. DOM Removal Logic (Drawer/Page) ---
+//                 if (isDrawerRemoveButton && targetElement) {
+//                     // ✅ DRAWER REMOVAL LOGIC
+//                     targetElement.remove();
+//                     // ... (Empty state logic and subtotal update is fine here) ...
+//                     const contentDiv = document.getElementById('wishlist-drawer-content');
+//                     if (!contentDiv.querySelector('li')) {
+//                         contentDiv.innerHTML = '<p class="text-muted text-center p-5">Aapki wishlist khaali hai!</p>';
+//                     }
+//                     document.getElementById('wishlist-subtotal').textContent = 'Rs. 0.00';
+
+//                 } else if (isWishlistPage) {
+//                     // Main Wishlist Page Logic
+//                     // ... (existing logic) ...
+//                 } else {
+//                     // Shop Page Logic: Icon ko empty karo
+//                     targetElement.querySelector('i').classList.remove('is-wishlisted', 'fas');
+//                     targetElement.querySelector('i').classList.add('far');
+//                 }
+
+//                 // --- 2. ✅ FIX: Shop Card Sync Logic (MUST RUN AFTER REMOVAL) ---
+//                 if (productId) {
+//                     // Poore DOM mein us product ID ke icon ko dhoondo aur unfilled karo
+//                     // Hum data-toggle-route attribute ka use karenge jismein product ID embedded hota hai.
+//                     const syncIcons = document.querySelectorAll(`[data-toggle-route*="/${productId}"] i`);
+
+//                     syncIcons.forEach(icon => {
+//                         // Agar icon milta hai (chahe woh shop page par ho, ya kisi aur page par)
+//                         icon.classList.remove('is-wishlisted', 'fas');
+//                         icon.classList.add('far');
+//                     });
+//                 }
+//             }
+
+//             // ✅ Counter Update (Navbar badge)
+//             const counter = document.getElementById('wishlist-count');
+//             if (counter && data.count !== undefined) {
+//                 counter.textContent = data.count;
+//             }
+//         })
+//         .catch(error => {
+//             console.error('Error:', error);
+//             // alert('Something went wrong! Please try again.');
+//             // ➡️ ALERT REPLACED
+//             window.showErrorAlert('Critical Error!', 'Something went wrong! Please try again.');
+//         });
+// };
 window.toggleWishlist = function (element) {
 
+    // 🔐 Authentication check
     if (!window.IS_AUTHENTICATED) {
-        // alert('Please login to add products to wishlist!');
-        // ➡️ ALERT REPLACED
-        window.showErrorAlert('Login Required!', 'Please login to add products to wishlist.');
+        window.showErrorAlert('Login Required!', 'Please login to use the wishlist.');
         return;
     }
 
+    // Identify environment
     const isWishlistPage = window.location.pathname.includes('/wishlist');
     const isDrawerRemoveButton = element.classList.contains('remove-wishlist-drawer-btn');
 
-    let url;
-    let targetElement;
+    // URL to send request
+    let url = element.dataset.toggleRoute;
 
-    // ✅ NEW: Product ID nikal lo, jo response handling mein kaam aayega
-    const productId = element.dataset.itemId || (element.closest('.wishlist-icon') ? element.closest('.wishlist-icon').dataset.itemId : null);
+    // Detect product ID for icon-sync
+    const productId = element.dataset.itemId || element.closest('[data-item-id]')?.dataset.itemId;
 
+    // Which element to remove from DOM
+    let targetElement = null;
 
-    // --- Determine URL and the DOM element to manipulate ---
+    // -------------------------------------------------
+    // 1️⃣ Wishlist Page (Table Page)
+    // -------------------------------------------------
+    if (isWishlistPage) {
 
+        targetElement = element.closest("tr");   // always a row
+        url = element.dataset.toggleRoute;       // url on the button
 
-
-    if (isDrawerRemoveButton && targetElement) {
-        targetElement.remove();
-        const contentDiv = document.getElementById('wishlist-drawer-content');
-        if (!contentDiv.querySelector('li')) {
-            contentDiv.innerHTML = '<p class="text-muted text-center p-5">Aapki wishlist khaali hai!</p>';
-        }
-        document.getElementById('wishlist-subtotal').textContent = 'Rs. 0.00';
-    }
-    else if (isWishlistPage) {
-        // Logic for main wishlist page (element is the remove button or the <tr>)
-        const removeBtn = element.querySelector('.remove-wishlist-btn') || element.closest('td').querySelector('button');
-        url = removeBtn ? removeBtn.dataset.toggleRoute : element.dataset.toggleRoute;
-        targetElement = element.closest('tr') || element;
-        // ✅ FIX: ADD THIS LINE TO REMOVE THE ROW
-        if (targetElement) {
-            targetElement.remove();
+        if (!url) {
+            return window.showErrorAlert("Error!", "Toggle route missing!");
         }
     }
+
+    // -------------------------------------------------
+    // 2️⃣ Wishlist Drawer (Sidebar)
+    // -------------------------------------------------
     else if (isDrawerRemoveButton) {
-        // ✅ DRAWER LOGIC: Element is the <button>. 
-        url = element.dataset.toggleRoute;
-        targetElement = element.closest('li'); // The element to remove from the DOM
+
+        targetElement = element.closest("li");  // each item is a list item
+
+        if (!url) {
+            return window.showErrorAlert("Error!", "Drawer route missing!");
+        }
     }
+
+    // -------------------------------------------------
+    // 3️⃣ Shop / Product Page Icon
+    // -------------------------------------------------
     else {
-        // Logic for Shop/Product Page Icon
-        url = element.dataset.toggleRoute;
-        targetElement = element;
+        targetElement = element; // icon element itself
     }
 
-    if (!url) {
-        // console.error("Toggle route not found.");
-        // ➡️ ALERT REPLACED
-        window.showErrorAlert('Configuration Error!', 'Toggle route not configured correctly.');
-        return;
-    }
-
-    // 🔁 Send AJAX Request
+    // -------------------------------------------------
+    // 🔁  AJAX REQUEST (POST)
+    // -------------------------------------------------
     fetch(url, {
-        method: 'POST',
+        method: "POST",
         headers: {
-            'X-CSRF-TOKEN': window.Laravel.csrfToken,
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
+            "X-CSRF-TOKEN": window.Laravel.csrfToken,
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        }
     })
-        .then(response => {
-            if (response.status === 401) {
-                // alert('Session expired or unauthorized. Please login.');
-                // ➡️ ALERT REPLACED
-                window.showErrorAlert('Session Expired!', 'Session expired or unauthorized. Please login.');
-                return { status: 'error' };
-            }
-            return response.json();
-        })
+        .then(res => res.json())
         .then(data => {
 
-            if (data.status === 'added') {
+            // -------------------------------------------------
+            // ❤️ ADDED TO WISHLIST
+            // -------------------------------------------------
+            if (data.status === "added") {
+
+                // Shop page icon update
                 if (!isWishlistPage && !isDrawerRemoveButton) {
-                    // Shop/Product Page Icon Update
-                    targetElement.querySelector('i').classList.add('is-wishlisted', 'fas');
-                    targetElement.querySelector('i').classList.remove('far');
+                    const icon = targetElement.querySelector("i");
+                    icon.classList.remove("far");
+                    icon.classList.add("fas", "is-wishlisted");
                 }
             }
-            else if (data.status === 'removed') {
 
-                // --- 1. DOM Removal Logic (Drawer/Page) ---
-                if (isDrawerRemoveButton && targetElement) {
-                    // ✅ DRAWER REMOVAL LOGIC
+            // -------------------------------------------------
+            // ❌ REMOVED FROM WISHLIST
+            // -------------------------------------------------
+            else if (data.status === "removed") {
+
+                // 1️⃣ Remove from UI (Wishlist Page)
+                if (isWishlistPage && targetElement) {
+                    targetElement.classList.add("row-fade-out");
+                    setTimeout(() => {
+                        targetElement.remove();
+
+                        // Check empty wishlist
+                        if (document.querySelectorAll("tbody tr").length === 0) {
+                            document.getElementById("wishlist-table-wrapper").style.display = "none";
+                            document.getElementById("wishlist-empty-box").style.display = "block";
+                        }
+                    }, 300);
+                }
+
+                // 2️⃣ Remove from Wishlist Drawer
+                else if (isDrawerRemoveButton && targetElement) {
                     targetElement.remove();
-                    // ... (Empty state logic and subtotal update is fine here) ...
-                    const contentDiv = document.getElementById('wishlist-drawer-content');
-                    if (!contentDiv.querySelector('li')) {
-                        contentDiv.innerHTML = '<p class="text-muted text-center p-5">Aapki wishlist khaali hai!</p>';
-                    }
-                    document.getElementById('wishlist-subtotal').textContent = 'Rs. 0.00';
 
-                } else if (isWishlistPage) {
-                    // Main Wishlist Page Logic
-                    // ... (existing logic) ...
-                } else {
-                    // Shop Page Logic: Icon ko empty karo
-                    targetElement.querySelector('i').classList.remove('is-wishlisted', 'fas');
-                    targetElement.querySelector('i').classList.add('far');
+                    const drawerList = document.getElementById("wishlist-drawer-content");
+                    if (!drawerList.querySelector("li")) {
+                        drawerList.innerHTML = '<p class="text-muted text-center p-5">Your wishlist is empty.</p>';
+                    }
+
+                    document.getElementById("wishlist-subtotal").textContent = "Rs. 0.00";
                 }
 
-                // --- 2. ✅ FIX: Shop Card Sync Logic (MUST RUN AFTER REMOVAL) ---
-                if (productId) {
-                    // Poore DOM mein us product ID ke icon ko dhoondo aur unfilled karo
-                    // Hum data-toggle-route attribute ka use karenge jismein product ID embedded hota hai.
-                    const syncIcons = document.querySelectorAll(`[data-toggle-route*="/${productId}"] i`);
+                // 3️⃣ Remove icon style from Shop/Product cards
+                else {
+                    const icon = targetElement.querySelector("i");
+                    icon.classList.remove("fas", "is-wishlisted");
+                    icon.classList.add("far");
+                }
 
-                    syncIcons.forEach(icon => {
-                        // Agar icon milta hai (chahe woh shop page par ho, ya kisi aur page par)
-                        icon.classList.remove('is-wishlisted', 'fas');
-                        icon.classList.add('far');
-                    });
+                // -------------------------------------------------
+                // 🔄 SYNC ICONS EVERYWHERE (Search, Home, Shop etc.)
+                // -------------------------------------------------
+                if (productId) {
+                    document
+                        .querySelectorAll(`[data-toggle-route*="/${productId}"] i`)
+                        .forEach(icon => {
+                            icon.classList.remove("fas", "is-wishlisted");
+                            icon.classList.add("far");
+                        });
                 }
             }
 
-            // ✅ Counter Update (Navbar badge)
-            const counter = document.getElementById('wishlist-count');
+            // -------------------------------------------------
+            // 🧮 Update Wishlist Counter in Navbar
+            // -------------------------------------------------
+            const counter = document.getElementById("wishlist-count");
             if (counter && data.count !== undefined) {
                 counter.textContent = data.count;
             }
         })
-        .catch(error => {
-            console.error('Error:', error);
-            // alert('Something went wrong! Please try again.');
-            // ➡️ ALERT REPLACED
-            window.showErrorAlert('Critical Error!', 'Something went wrong! Please try again.');
+        .catch(err => {
+            console.error(err);
+            window.showErrorAlert("Error!", "Something went wrong.");
         });
 };
+
 
 window.fetchWishlistContent = function (event) {
     event.preventDefault();

@@ -39,7 +39,7 @@
                 <td>{{ $order->id }}</td>
 
                 {{-- Correct Total Column --}}
-                <td>${{ number_format($order->total_amount, 2) }}</td>
+                <td>₹{{ number_format($order->total_amount, 2) }}</td>
 
                 {{-- Status Badge --}}
                 <td>

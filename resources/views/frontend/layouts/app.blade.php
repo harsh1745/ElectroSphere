@@ -14,7 +14,8 @@
         <link rel="dns-prefetch" href="//fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=Nunito:400,600,700" rel="stylesheet">
         <!-- Font awesome for Icons -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <link href="{{ asset('fontawesome/css/all.min.css') }}" rel="stylesheet">
+
 
         <!-- Scripts -->
         <!-- Local Bootstrap CSS -->
@@ -28,7 +29,7 @@
 
     </head>
 
-    <body>
+    <body class="d-flex flex-column min-vh-100 justify-content-between">
         <div id="app">
 
             <!-- 1. Top Black Banner -->
@@ -72,29 +73,20 @@
                                 {{-- Home Link: isActive('home') use karein --}}
                                 <a class="nav-link {{ Request::routeIs('home') || Request::is('/') ? 'active' : '' }}" aria-current="page" href="{{ url('/') }}">Home</a>
                             </li>
-
                             {{-- Shop Link: Request::routeIs('shop.*') use karein --}}
                             <li class="nav-item">
                                 <a class="nav-link {{ Request::routeIs('shop.*') ? 'active' : '' }}" href="{{ route('shop.index') }}">Shop</a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link" href="#">Contact</a>
+                                <a class="nav-link" href="{{ route('contact') }}">Contact</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">About</a>
+                            <li class=" nav-item">
+                                <a class="nav-link" href="{{ route('about') }}">About</a>
                             </li>
-
-                            <!-- ... (rest of the ul content is fine) ... -->
                         </ul>
 
                         <div class="d-flex align-items-center">
-
-                            <!-- <div class="search-container me-4 d-none d-lg-block">
-                                <input class="form-control search-input" type="search" placeholder="What are you looking for?" aria-label="Search" style="margin-bottom: 0px;">
-                                <i class="fas fa-search search-icon"></i>
-                            </div> -->
-
                             <ul class="navbar-nav d-lg-none">
                                 @guest
                                 @if (Route::has('login'))
@@ -114,10 +106,6 @@
                             </ul>
 
                             <div class="d-none d-lg-flex align-items-center">
-
-                                {{-- ✅ WISHLIST ICON WITH COUNT BADGE --}}
-                                {{-- Note: यह count सिर्फ़ logged-in users के लिए दिखेगा --}}
-                                {{-- app.blade.php mein Heart Icon ka final code --}}
                                 <a href="#" class="icon-link position-relative me-4"
                                     data-bs-toggle="offcanvas"
                                     data-bs-target="#wishlistOffcanvas"
@@ -129,7 +117,6 @@
                                         {{ Auth::check() ? App\Http\Controllers\Frontend\WishlistController::getWishlistCount() : 0 }}
                                     </span>
                                 </a>
-
                                 {{-- CART ICON --}}
                                 <a href="{{ route('cart.index') }}" class="icon-link position-relative" title="Cart">
                                     {{-- ✅ Basket Icon --}}
@@ -137,7 +124,7 @@
 
                                     {{-- ✅ Cart Count Display --}}
                                     <span id="cart-count" class="badge wishlist-badge rounded-pill" style="color:black; right: -5px;">
-                                        {{ Auth::check() ? App\Http\Controllers\Frontend\CartController::getCartCount() : 0 }}
+                                        {{ $cartCount }}
                                     </span>
                                 </a>
                             </div>
@@ -155,7 +142,7 @@
                                 <div class="dropdown-menu dropdown-menu-end user-dropdown-menu" aria-labelledby="navbarDropdown">
 
                                     {{-- 1. Manage My Account (Home/Profile Page) --}}
-                                    <a class="dropdown-item" href="{{ route('home') }}">
+                                    <a class="dropdown-item" href="{{ route('account.index') }}">
                                         <i class="fas fa-user me-2"></i> {{ __('Manage My Account') }}
                                     </a>
 
@@ -166,28 +153,6 @@
                                     @else
                                     <a class="dropdown-item" href="#">
                                         <i class="fas fa-box"></i> {{ __('My Orders') }} (Coming Soon)
-                                    </a>
-                                    @endif
-
-                                    {{-- 3. My Cancellations --}}
-                                    @if (Route::has('orders.cancelled'))
-                                    <a class="dropdown-item" href="{{ route('orders.cancelled') }}">
-                                        <i class="fas fa-times-circle me-2"></i> {{ __('My Cancellations') }}
-                                    </a>
-                                    @else
-                                    <a class="dropdown-item" href="#">
-                                        <i class="fas fa-times-circle me-2"></i> {{ __('My Cancellations') }}
-                                    </a>
-                                    @endif
-
-                                    {{-- 4. My Reviews --}}
-                                    @if (Route::has('reviews.index'))
-                                    <a class="dropdown-item" href="{{ route('reviews.index') }}">
-                                        <i class="fas fa-star me-2"></i> {{ __('My Reviews') }}
-                                    </a>
-                                    @else
-                                    <a class="dropdown-item" href="#">
-                                        <i class="fas fa-star me-2"></i> {{ __('My Reviews') }}
                                     </a>
                                     @endif
 
@@ -223,7 +188,7 @@
                     </div>
                 </div>
             </nav>
-            <main class="py-0">
+            <main class="py-0 flex-grow-1">
                 @yield('content')
             </main>
             <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080;">
@@ -262,6 +227,7 @@
                 <a href="{{ route('wishlist.index') }}" class="btn w-100 text-white fw-semibold" style="background-color: #7b68ee;">View Full Wishlist</a>
             </div>
         </div>
+        @include('frontend.layouts.footer')
 
         <!-- Local Bootstrap JS -->
         <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>

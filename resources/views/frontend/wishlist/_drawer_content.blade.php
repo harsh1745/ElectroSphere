@@ -17,7 +17,7 @@
             <img src="{{ $imageSource }}" alt="{{ $product->name }}" class="me-3 border rounded" style="width: 60px; height: 60px; object-fit: cover;">
             <div>
                 <a href="{{ $productLink }}" class="text-dark fw-semibold text-decoration-none d-block mb-1">{{ Str::limit($product->name, 20) }}</a>
-                <span class="text-danger fw-bold small">Rs. {{ number_format($product->price, 2) }}</span>
+                <span class="text-danger fw-bold small">₹{{ number_format($product->price, 2) }}</span>
             </div>
         </div>
 

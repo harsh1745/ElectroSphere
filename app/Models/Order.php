@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends Model
 {
     use HasFactory;
+    protected $table = 'orders'; // FIX ADDED 👈
 
     /**
      * ✅ FIX: $fillable array ko aapke simple 'orders' table se match karein

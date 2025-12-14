@@ -55,7 +55,7 @@ $maxPrice = $maxPrice ?? '';
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Price Range ($)</label>
+                    <label class="form-label fw-semibold">Price Range (₹)</label>
                     <div class="row g-2">
                         <div class="col-6">
                             <input type="number"
@@ -188,7 +188,7 @@ $maxPrice = $maxPrice ?? '';
                                 <i class="fas fa-star"></i><i class="fas fa-star"></i>
                                 <i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i><i class="far fa-star"></i>
                             </div>
-                            <p class="product-price mb-0 text-danger fw-bold">${{ number_format($product->price, 2) }}</p>
+                            <p class="product-price mb-0 text-danger fw-bold">₹{{ number_format($product->price, 2) }}</p>
                         </div>
                     </div>
                 </div>

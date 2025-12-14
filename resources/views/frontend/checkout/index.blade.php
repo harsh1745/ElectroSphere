@@ -56,7 +56,7 @@
                     <div class="text-end mt-3 d-flex gap-2 justify-content-end">
 
                         {{-- EDIT BUTTON --}}
-                        <button type="button" class="btn btn-sm btn-outline-primary"
+                        <button type="button" style="height: 31px;" class="btn btn-sm btn-outline-primary"
                             data-bs-toggle="modal"
                             data-bs-target="#editAddressModal_{{ $address->id }}">
                             Edit
@@ -194,7 +194,7 @@
                         <div class="mb-3">
                             <h5 class="fw-bold mb-1">
                                 All Total:
-                                <span class="text-success">${{ number_format($finalTotal, 2) }}</span>
+                                <span class="text-success">₹{{ number_format($finalTotal, 2) }}</span>
                             </h5>
                             <p class="text-muted small">By clicking 'Confirm & Pay', you agree to the terms.</p>
                         </div>
@@ -222,14 +222,14 @@
                             <span class="fw-semibold">{{ Str::limit($product->name, 25) }}</span>
                             <span class="text-muted small">x{{ $item->quantity }}</span>
                         </div>
-                        <span class="fw-semibold">${{ number_format($product->price * $item->quantity, 2) }}</span>
+                        <span class="fw-semibold">₹{{ number_format($product->price * $item->quantity, 2) }}</span>
                     </li>
                     @endforeach
                 </ul>
 
                 <div class="d-flex justify-content-between border-top pt-3">
                     <span>Subtotal</span>
-                    <span>${{ number_format($subtotal, 2) }}</span>
+                    <span>₹{{ number_format($subtotal, 2) }}</span>
                 </div>
                 <div class="d-flex justify-content-between">
                     <span>Shipping</span>
@@ -237,14 +237,14 @@
                         @if ($shippingCost == 0.00)
                         <span class="text-success fw-bold">Free</span>
                         @else
-                        ${{ number_format($shippingCost, 2) }}
+                        ₹{{ number_format($shippingCost, 2) }}
                         @endif
                     </span>
                 </div>
 
                 <div class="d-flex justify-content-between fw-bold py-3 border-top mt-2">
                     <span>Total Amount</span>
-                    <span class="text-danger">${{ number_format($finalTotal, 2) }}</span>
+                    <span class="text-danger">₹{{ number_format($finalTotal, 2) }}</span>
                 </div>
             </div>
             <a href="{{ route('shop.index') }}" class="btn btn-outline-secondary fw-bold mt-4">
@@ -310,7 +310,190 @@
     </div>
 </div>
 
+@push('styles')
+<style>
+    :root {
+        --theme: #DB4444;
+        --theme-dark: #C53A3A;
+        --light-bg: #FFF1F1;
+        --soft-border: #ffd4d4;
+    }
 
+    /* ===========================================
+    HEADINGS
+=========================================== */
+    h2.fw-bold,
+    h4.fw-bold {
+        color: var(--theme);
+    }
+
+    /* ===========================================
+    ADDRESS CARD STYLING
+=========================================== */
+    .shipping-address-content .form-check {
+        background: #ffffff;
+        border: 1px solid var(--soft-border);
+        border-radius: 12px;
+        transition: .25s ease;
+    }
+
+    .shipping-address-content .form-check:hover {
+        border-color: var(--theme);
+        box-shadow: 0 4px 12px rgba(219, 68, 68, 0.18);
+    }
+
+    .shipping-address-content .form-check-input:checked {
+        background-color: var(--theme);
+        border-color: var(--theme);
+    }
+
+    .btn-outline-primary {
+        border-color: var(--theme);
+        color: var(--theme);
+    }
+
+    .btn-outline-primary:hover {
+        background: var(--theme);
+        color: white;
+    }
+
+    .btn-outline-danger {
+        border-color: var(--theme);
+        color: var(--theme);
+    }
+
+    .btn-outline-danger:hover {
+        background: var(--theme);
+        color: white;
+    }
+
+    /* ===========================================
+    ADD ADDRESS BUTTON
+=========================================== */
+    .btn.btn-dark {
+        background: var(--theme) !important;
+        border-color: var(--theme) !important;
+    }
+
+    .btn.btn-dark:hover {
+        background: var(--theme-dark) !important;
+    }
+
+    /* ===========================================
+    PAYMENT METHOD BOX
+=========================================== */
+    .payment-method-content {
+        border-color: var(--soft-border) !important;
+        background: #fff;
+        border-radius: 10px;
+    }
+
+    .payment-method-content .form-check-input:checked {
+        background-color: var(--theme);
+        border-color: var(--theme);
+    }
+
+    /* ===========================================
+    CAPTCHA BOX
+=========================================== */
+    .captcha-check {
+        border-color: var(--soft-border) !important;
+        background: #fff;
+        border-radius: 10px;
+    }
+
+    .captcha-check label {
+        color: var(--theme);
+    }
+
+    /* ===========================================
+    BUYER PROTECTION SECTION
+=========================================== */
+    .d-flex.align-items-start.gap-3 i {
+        color: var(--theme) !important;
+    }
+
+    .d-flex.align-items-start.gap-3 small {
+        font-size: 13px;
+    }
+
+    /* ===========================================
+    CONFIRM & PAY BUTTON (PREMIUM)
+=========================================== */
+    #checkout_form button[type="submit"] {
+        background: linear-gradient(90deg, #DB4444, #C53A3A);
+        border: none;
+        padding: 14px 32px;
+        border-radius: 10px;
+        font-weight: 700;
+        color: white;
+        letter-spacing: .5px;
+        transition: .25s ease;
+    }
+
+    #checkout_form button[type="submit"]:hover {
+        background: linear-gradient(90deg, #C53A3A, #DB4444);
+        transform: translateY(-2px);
+    }
+
+    /* ===========================================
+    ORDER SUMMARY BOX
+=========================================== */
+    .order-summary-section {
+        border-radius: 14px;
+        border-color: var(--soft-border) !important;
+        box-shadow: 0 6px 18px rgba(219, 68, 68, 0.10);
+    }
+
+    .order-summary-section h4 {
+        color: var(--theme);
+        font-weight: 800;
+    }
+
+    .order-summary-section span.text-danger {
+        color: var(--theme) !important;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .list-group-item {
+        border: none;
+        padding: 14px 0 !important;
+        font-size: 15px;
+    }
+
+    /* Continue shopping */
+    .btn-outline-secondary {
+        border-radius: 10px;
+        border-color: var(--theme) !important;
+        color: var(--theme) !important;
+        font-weight: 600;
+    }
+
+    .btn-outline-secondary:hover {
+        background: var(--theme);
+        color: white !important;
+    }
+
+    /* Modal Styling */
+    .modal-header {
+        background: var(--light-bg);
+        border-bottom: 1px solid var(--soft-border);
+    }
+
+    .modal-title {
+        color: var(--theme);
+    }
+
+    /* Inputs */
+    .form-control:focus {
+        border-color: var(--theme);
+        box-shadow: 0 0 4px rgba(219, 68, 68, 0.4);
+    }
+</style>
+@endphp
+
+@endpush
 @push('scripts')
 <script src="{{ asset('js/sweetalert.js') }}"></script>
 

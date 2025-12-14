@@ -72,10 +72,10 @@ class ShopController extends Controller
 
     public function show($slug)
     {
-        // Product ko uske slug se fetch karo
+        // Product ko slug se fetch karo
         $product = Product::where('slug', $slug)->firstOrFail();
 
-        // Product ke reviews fetch karo
+        // Product reviews (latest 10)
         $reviews = Review::where('product_id', $product->id)
             ->where('status', 'approved')
             ->with('user')
@@ -83,7 +83,7 @@ class ShopController extends Controller
             ->take(10)
             ->get();
 
-        // Wishlist status check
+        // Wishlist status
         $isWishlisted = false;
         if (Auth::check()) {
             $isWishlisted = Wishlist::where('user_id', Auth::id())
@@ -91,11 +91,23 @@ class ShopController extends Controller
                 ->exists();
         }
 
-        // Static dummy data for demonstration (Rating, Sold count, Manufacturer details)
-        $rating = 4.5;
-        $soldCount = 500;
-        $manufacturerDetails = "Manufacturer: XYZ Corp. | Model: RN2019 | Warranty: 1 Year.";
+        // ⭐ REAL SOLD COUNT — FROM order_details TABLE
+        $soldCount = \App\Models\OrderDetail::where('product_id', $product->id)
+            ->sum('quantity');
 
-        return view('frontend.shop.show', compact('product', 'reviews', 'isWishlisted', 'rating', 'soldCount', 'manufacturerDetails'));
+        // ⭐ Rating — Calculate average rating from reviews
+        $rating = $reviews->avg('rating') ?? 0;
+
+        // Manufacturer
+        $manufacturerDetails = $product->manufacturer ?? "Manufacturer info not available.";
+
+        return view('frontend.shop.show', compact(
+            'product',
+            'reviews',
+            'isWishlisted',
+            'rating',
+            'soldCount',
+            'manufacturerDetails'
+        ));
     }
 }

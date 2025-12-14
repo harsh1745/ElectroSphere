@@ -18,9 +18,9 @@
     <div class="row">
         <div class="col-lg-12">
 
-            {{--  ⭐ EMPTY BOX UI (Hidden unless empty) --}}
+            {{-- ⭐ EMPTY BOX UI (Hidden unless empty) --}}
             <div id="wishlist-empty-box"
-     @if($wishlistItems->isEmpty()) style="display:block;" @else style="display:none;" @endif>
+                @if($wishlistItems->isEmpty()) style="display:block;" @else style="display:none;" @endif>
 
                 <div class="alert alert-info text-center mt-5">
                     Your wishlist is empty. Let's start shopping!
@@ -32,7 +32,7 @@
 
             {{-- ⭐ WISHLIST TABLE WRAPPER --}}
             <div id="wishlist-table-wrapper"
-     @if($wishlistItems->isEmpty()) style="display:none;" @else style="display:block;" @endif>
+                @if($wishlistItems->isEmpty()) style="display:none;" @else style="display:block;" @endif>
                 <div class="table-responsive">
                     <table class="table align-middle wishlist-table" style="min-width: 600px;">
                         <thead>
@@ -47,38 +47,40 @@
 
                         <tbody>
                             @foreach($wishlistItems as $wishlistItem)
-                                @php
-                                    $product = $wishlistItem->product;
-                                    if (!$product) continue;
-                                @endphp
+                            @php
+                            $product = $wishlistItem->product;
+                            if (!$product) continue;
+                            @endphp
 
-                                <tr id="wishlist-row-{{ $product->id }}">
-                                    <td>
-                                        <img src="{{ asset('storage/'.$product->image) }}" style="max-height:100px;">
-                                    </td>
-                                    <td>{{ $product->name }}</td>
-                                    <td>${{ number_format($product->price, 2) }}</td>
+                            <tr id="wishlist-row-{{ $product->id }}">
+                                <td>
+                                    <img src="{{ asset('storage/'.$product->image) }}" style="max-height:100px;">
+                                </td>
+                                <td>{{ $product->name }}</td>
+                                <td>₹{{ number_format($product->price, 2) }}</td>
 
-                                    <td>
-                                        <button class="btn btn-sm text-white"
-                                            style="background:#7b68ee"
-                                            data-product-id="{{ $product->id }}"
-                                            data-cart-route="{{ route('cart.add', $product->id) }}"
-                                            data-wishlist-route="{{ route('wishlist.toggle', $product->id) }}"
-                                            onclick="moveFromWishlistToCart(this)">
-                                            Add to Cart
-                                        </button>
-                                    </td>
+                                <td>
+                                    <button class="btn btn-sm text-white"
+                                        style="background:#7b68ee"
+                                        data-product-id="{{ $product->id }}"
+                                        data-cart-route="{{ route('cart.add', $product->id) }}"
+                                        data-wishlist-route="{{ route('wishlist.toggle', $product->id) }}"
+                                        onclick="moveFromWishlistToCart(this)">
+                                        Add to Cart
+                                    </button>
+                                </td>
 
-                                    <td>
-                                        <button class="btn btn-sm text-white"
-                                            style="background:#7b68ee"
-                                            data-toggle-route="{{ route('wishlist.toggle', $product->id) }}"
-                                            onclick="toggleWishlist(this.closest('tr'))">
-                                            X
-                                        </button>
-                                    </td>
-                                </tr>
+                                <td>
+                                    <button class="btn btn-sm text-white remove-wishlist-btn"
+                                        style="background:#7b68ee"
+                                        data-toggle-route="{{ route('wishlist.toggle', $product->id) }}"
+                                        data-item-id="{{ $product->id }}"
+                                        onclick="toggleWishlist(this)">
+                                        X
+                                    </button>
+
+                                </td>
+                            </tr>
 
                             @endforeach
                         </tbody>

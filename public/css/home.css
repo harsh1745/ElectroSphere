@@ -137,10 +137,11 @@
 }
 
 .category-card-outline {
-    /* Image jaisa thin border aur no shadow */
     border: 1px solid #e9ecef;
     border-radius: 4px;
+    display: flex;
     transition: all 0.25s ease-in-out;
+    align-items: center;
 }
 
 /* Category Image size fix */

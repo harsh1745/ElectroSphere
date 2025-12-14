@@ -5,6 +5,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\ContactAdminController;
 use App\Http\Controllers\Admin\LoginController as AdminLoginController;
 use App\Http\Controllers\Auth\LoginController; // ✅ YEH LINE ADD KARO
 use App\Http\Controllers\Frontend\ShopController; // Ensure this is the correct path
@@ -16,10 +17,14 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Frontend\AddressController; // Naya Controller import karein
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Frontend\AccountController;
+use App\Http\Controllers\Frontend\ForgotController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Frontend\InvoiceController; // ✅ Make sure this controller exists and is imported
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Frontend\ContactController;
+use App\Http\Controllers\Frontend\AboutController;
 use App\Models\User;
 use App\Models\Product;
 use App\Models\Category;
@@ -148,24 +153,6 @@ Route::middleware(['auth'])->group(function () {
 
     Route::delete('/user/address/{id}', [AddressController::class, 'destroy'])->name('user.address.delete');
 
-
-
-
-
-    // 1. My Orders (Where all orders are listed)
-    // 1. My Orders (Orders List Page)
-    // ✅ Yahan hum wohi method use kar sakte hain jo Invoices ke liye bana hai
-    // Route::get('/account/my-orders', [AccountController::class, 'invoicesIndex'])
-    //     ->name('orders.index');
-    // // 2. ✅ My Invoices (NEW: Where all invoices/past orders are listed)
-    // Route::get('/invoice/{order_id}', [AccountController::class, 'showInvoice'])
-    //     ->name('invoice.show');
-    // // 3. Invoice Show (For viewing a specific invoice PDF/HTML)
-    // Route::get('/account/invoices/{order_id}', [AccountController::class, 'showInvoice'])->name('account.invoices.show');
-
-    // // Example Route in web.php
-    // Route::get('/account/invoices', [AccountController::class, 'invoicesIndex'])->name('invoices.index');
-
     // 1. ✅ PRIMARY LISTING ROUTE: "My Orders" will show the list of all invoices
     Route::get('/account/my-orders', [AccountController::class, 'invoicesIndex'])
         ->name('orders.index');
@@ -173,23 +160,33 @@ Route::middleware(['auth'])->group(function () {
     // 2. Invoice Detail Route: (This is essential for the 'View Invoice' button)
     Route::get('/invoice/{order_id}', [AccountController::class, 'showInvoice'])
         ->name('invoice.show');
+    Route::get('/account', [App\Http\Controllers\Frontend\AccountController::class, 'index'])
+        ->name('account.index');
+
+    Route::get('/account/edit', [App\Http\Controllers\Frontend\AccountController::class, 'edit'])
+        ->name('account.edit');
+
+    Route::post('/account/update', [App\Http\Controllers\Frontend\AccountController::class, 'update'])
+        ->name('account.update');
+    Route::get('/account/forgot-password', [ForgotController::class, 'showForm'])->name('custom.forgot');
+    Route::post('/account/forgot-password/check', [ForgotController::class, 'checkUser'])->name('custom.forgot.check');
+    Route::get('/account/reset-password/{id}', [ForgotController::class, 'showResetForm'])->name('custom.reset');
+    Route::post('/account/reset-password/{id}', [ForgotController::class, 'resetPassword'])->name('custom.reset.save');
+    // Contact Page
+    Route::get('/contact', [ContactController::class, 'index'])->name('contact');
+
+    // Contact Form Submit
+    Route::post('/contact/send', [ContactController::class, 'store'])->name('contact.store');
+    Route::get('/about', [AboutController::class, 'index'])->name('about');
+    // FRONTEND PRODUCT DETAIL PAGE
+    Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show');
 });
 
 // =========================================================================================
 // ✅ ALL PROTECTED ADMIN ROUTES (auth:admin Middleware)
 // =========================================================================================
 Route::middleware(['auth:admin'])->prefix('admin')->group(function () {
-
-    // 1. DASHBOARD Route Update (Data fetching ke liye)
-    Route::get('/dashboard', function () {
-        // Data fetch karo
-        $productCount = Product::count();
-        $categoryCount = Category::count();
-        $userCount = User::count(); // Customer users ka count
-
-        // Data ko view mein pass karo
-        return view('admin.dashboard', compact('productCount', 'categoryCount', 'userCount'));
-    })->name('admin.dashboard'); // ✅ YEH AB DATA PASS KAREGA
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
     // 2. CATEGORIES MANAGEMENT ...
     Route::get('/categories', [CategoryController::class, 'index'])->name('admin.categories.index');
@@ -214,7 +211,10 @@ Route::middleware(['auth:admin'])->prefix('admin')->group(function () {
     Route::get('/orders', [OrderController::class, 'index'])->name('admin.orders.index');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('admin.orders.show');
     Route::put('/admin/orders/{order}/status', [OrderController::class, 'updateStatus'])
-    ->name('admin.orders.updateStatus');
+        ->name('admin.orders.updateStatus');
+
+    Route::get('/admin/contacts', [ContactAdminController::class, 'index'])
+        ->name('admin.contacts.index');
 });
 // Shop Routes (Customer Facing)
 Route::prefix('shop')->name('shop.')->group(function () {

@@ -109,12 +109,12 @@
 
                         <div class="summary-row d-flex justify-content-between mb-2">
                             <span class="text-muted fw-semibold">Subtotal:</span>
-                            <span class="fw-bold">${{ number_format($order->subtotal, 2) }}</span>
+                            <span class="fw-bold">₹{{ number_format($order->subtotal, 2) }}</span>
                         </div>
 
                         <div class="summary-row d-flex justify-content-between mb-2">
                             <span class="text-muted fw-semibold">Shipping:</span>
-                            <span class="fw-bold">${{ number_format($order->shipping_cost, 2) }}</span>
+                            <span class="fw-bold">₹{{ number_format($order->shipping_cost, 2) }}</span>
                         </div>
 
                         <hr>
@@ -122,7 +122,7 @@
                         <div class="summary-row d-flex justify-content-between mt-2">
                             <span class="fw-bold fs-5">Grand Total:</span>
                             <span class="fw-bold fs-5 text-danger">
-                                ${{ number_format($order->total_amount, 2) }}
+                                ₹{{ number_format($order->total_amount, 2) }}
                             </span>
                         </div>
 
@@ -155,8 +155,8 @@
                     <tr>
                         <td>{{ $item->product->name ?? 'Deleted Product' }}</td>
                         <td>{{ $item->quantity }}</td>
-                        <td>${{ number_format($item->price,2) }}</td>
-                        <td>${{ number_format($item->price * $item->quantity,2) }}</td>
+                        <td>₹{{ number_format($item->price,2) }}</td>
+                        <td>₹{{ number_format($item->price * $item->quantity,2) }}</td>
                         <td>{{ $item->product->stock ?? 'N/A' }}</td>
                     </tr>
                     @endforeach
@@ -172,71 +172,139 @@
 {{-- CSS --}}
 @push('styles')
 <style>
-    .summary-box {
-        background: #f8f9fa;
-        border-radius: 8px;
-    }
+:root {
+    --theme: #DB4444;
+    --theme-dark: #c53a3a;
+    --admin-bg: #f8f9fc;
+}
 
-    .summary-row span {
-        font-size: 15px;
-    }
+/* ===============================
+   GLOBAL CARD HOVER
+=============================== */
+.order-card {
+    border-radius: 12px !important;
+    border: none !important;
+    transition: .25s ease;
+}
 
-    .summary-box:hover {
-        background: #f8f9fa !important;
-        /* No hover change */
-    }
+.order-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 22px rgba(219, 68, 68, 0.18);
+}
 
-    .summary-row:hover {
-        background: transparent !important;
-        /* No hover effect */
-        cursor: default;
-    }
+/* ===============================
+   SECTION HEADINGS
+=============================== */
+.card-header {
+    background: var(--theme) !important;
+    border-radius: 12px 12px 0 0 !important;
+    padding: 18px !important;
+}
 
-    .order-card:hover {
-        transform: translateY(-3px);
-        transition: 0.25s ease-in-out;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
-    }
+.card-header h6 {
+    color: white !important;
+    font-weight: 700 !important;
+    letter-spacing: .5px;
+}
 
-    .status-badge {
-        padding: 6px 12px;
-        border-radius: 4px;
-        font-weight: bold;
-        font-size: 13px;
-        color: white;
-    }
+/* ===============================
+   STATUS BADGES
+=============================== */
+.status-badge {
+    padding: 7px 14px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: .3px;
+}
 
-    .badge-refunded {
-        background: #6f42c1;
-        /* purple */
-    }
+.badge-pending {
+    background: #ffdd57;
+    color: #444;
+}
 
+.badge-processing {
+    background: #17a2b8;
+}
 
-    .badge-pending {
-        background: #ffc107;
-        color: black;
-    }
+.badge-shipped {
+    background: #007bff;
+}
 
-    .badge-processing {
-        background: #17a2b8;
-    }
+.badge-completed {
+    background: #28a745;
+}
 
-    .badge-shipped {
-        background: #007bff;
-    }
+.badge-cancelled {
+    background: #db4444;
+}
 
-    .badge-completed {
-        background: #28a745;
-    }
+.badge-refunded {
+    background: #6f42c1;
+}
 
-    .badge-cancelled {
-        background: #dc3545;
-    }
+/* ===============================
+    FINANCIAL SUMMARY BOX
+=============================== */
+.summary-box {
+    background: #fff4f4 !important;
+    border-radius: 12px;
+    border: 1px solid #ffd4d4;
+}
 
-    table tbody tr:hover {
-        background: #f9f9f9;
-        cursor: pointer;
-    }
+.summary-row span {
+    font-size: 15px;
+}
+
+.summary-row .text-danger {
+    color: var(--theme) !important;
+}
+
+/* ===============================
+    UPDATE STATUS BUTTON
+=============================== */
+.btn-primary {
+    background: var(--theme) !important;
+    border-color: var(--theme) !important;
+    font-weight: 700 !important;
+    padding: 10px 20px !important;
+    border-radius: 8px !important;
+    letter-spacing: .5px;
+}
+
+.btn-primary:hover {
+    background: var(--theme-dark) !important;
+}
+
+/* ===============================
+    TABLE STYLING
+=============================== */
+table thead tr {
+    background: #ffecec !important;
+}
+
+table thead th {
+    color: var(--theme) !important;
+    font-weight: 700 !important;
+}
+
+table tbody tr:hover {
+    background: #fff4f4 !important;
+    cursor: pointer;
+}
+
+table td {
+    font-size: 15px;
+}
+
+/* ===============================
+    PAGE TITLE
+=============================== */
+h1.h3 {
+    color: var(--theme) !important;
+    font-weight: 800 !important;
+}
+
 </style>
 @endpush
 

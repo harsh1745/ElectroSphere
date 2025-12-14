@@ -8,6 +8,8 @@
 
     <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
     <script src="{{ asset('js/chart.js') }}"></script>
+    <!-- Font awesome for Icons -->
+    <link href="{{ asset('fontawesome/css/all.min.css') }}" rel="stylesheet">
 
     <style>
         /* Basic Admin Styles for layout */
@@ -23,9 +25,17 @@
         #sidebar-wrapper {
             min-height: 100vh;
             width: 250px;
-            background-color: #343a40;
+            background-color: #db4444;
             color: white;
             padding-top: 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            /* Full height */
+            overflow-y: auto;
+            /* Scroll inside if items overflow */
+            z-index: 999;
         }
 
         #page-content-wrapper {
@@ -50,8 +60,8 @@
 
         .list-group-item:hover,
         .list-group-item.active {
-            background-color: #495057;
-            color: white;
+            background-color: #722c2c !important;
+            color: white !important;
         }
 
         .top-bar {
@@ -61,6 +71,11 @@
             display: flex;
             justify-content: flex-end;
             align-items: center;
+        }
+
+        .list-group-item-action:focus {
+            background-color: #db4444 !important;
+            color: white !important;
         }
     </style>
     @push('styles')
@@ -74,7 +89,7 @@
     <div id="wrapper">
 
         <div id="sidebar-wrapper">
-            <div class="sidebar-heading">E-commerce Admin</div>
+            <div class="sidebar-heading">ElectroSphere Admin</div>
 
             <div class="list-group list-group-flush">
 
@@ -101,16 +116,17 @@
                     Orders
                 </a>
 
-                {{-- 5. Reviews --}}
-                <a href="#" class="list-group-item list-group-item-action">
-                    Reviews
-                </a>
-
                 {{-- 6. Admins (Users) --}}
                 <a href="{{ route('admin.users.index') }}"
                     class="list-group-item list-group-item-action {{ Request::routeIs('admin.users.*') ? 'active' : '' }}">
                     Users
                 </a>
+                {{-- 7. Contact Messages --}}
+                <a href="{{ route('admin.contacts.index') }}"
+                    class="list-group-item list-group-item-action {{ Request::routeIs('admin.contacts.*') ? 'active' : '' }}">
+                    Contact Messages
+                </a>
+
 
 
                 {{-- Logout Button --}}
@@ -124,13 +140,13 @@
                 </form>
             </div>
         </div>
-        <div id="page-content-wrapper">
+        <div id="page-content-wrapper" style="padding-left: 17rem;">
 
-            <div class="top-bar">
+            <!-- <div class="top-bar">
                 <span>Welcome, Admin!</span>
-            </div>
+            </div> -->
 
-            <div class="container-fluid">
+            <div class="container-fluid" style="padding-right: 0rem;padding-left: 0rem;">
                 {{-- Yahaan par har page ka content aayega --}}
                 @yield('content')
             </div>

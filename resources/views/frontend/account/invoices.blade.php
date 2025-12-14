@@ -25,7 +25,7 @@
             <tr>
                 <td>{{ $invoice->id }}</td>
                 <td>{{ $invoice->order_id }}</td>
-                <td>${{ number_format($invoice->total, 2) }}</td>
+                <td>₹{{ number_format($invoice->total, 2) }}</td>
                 <td>{{ $invoice->created_at->format('d M Y') }}</td>
                 <td>
                     <a href="{{ asset('storage/invoices/' . $invoice->file) }}" target="_blank"

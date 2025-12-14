@@ -69,25 +69,12 @@
         <div class="col-lg-6 product-details-actions">
 
             <h1 class="fw-bold mb-2">{{ $product->name }}</h1>
+            <p class="sold-badge mb-3">
+                {{ $soldCount }} Sold
+            </p>
 
-            <div class="d-flex align-items-center mb-3">
-                {{-- Rating --}}
-                <div class="rating me-3 text-warning">
-                    @for ($i = 1; $i <= 5; $i++)
-                        @if ($rating>= $i)
-                        <i class="fas fa-star"></i>
-                        @elseif ($rating > $i - 1)
-                        <i class="fas fa-star-half-alt"></i>
-                        @else
-                        <i class="far fa-star"></i>
-                        @endif
-                        @endfor
-                </div>
-                <span class="text-muted me-3">({{ $rating }})</span>
-                <span class="text-muted">| {{ $soldCount ?? 0 }} Sold</span>
-            </div>
 
-            <h2 class="text-danger fw-bolder mb-4">${{ number_format($product->price, 2) }}</h2>
+            <h2 class="text-danger fw-bolder mb-4">₹{{ number_format($product->price, 2) }}</h2>
 
             <p class="text-muted mb-4">{{ Str::limit($product->description, 200) }}</p>
             <p class="text-muted mb-4">
@@ -125,7 +112,7 @@
                 {{-- Add to Cart Button --}}
                 @if ($isAvailable)
                 {{-- Add to Cart Button (Enabled for In Stock and Low Stock) --}}
-                <button class="btn btn-dark text-uppercase px-4 py-2"
+                <button class="btn-add-cart"
                     {{ $disableControls }} {{-- Agar $isAvailable true hai, toh yeh empty rahega --}}
                     onclick="addToCart(this)"
                     data-route="{{ route('cart.add', ['product' => $product->id]) }}">
@@ -133,8 +120,7 @@
                 </button>
 
                 {{-- Buy Now Button --}}
-                <button class="btn text-uppercase px-4 py-2 fw-semibold"
-                    style="background-color: #e0d0a7;"
+                <button class="btn-buy-now"
                     onclick="buyNow(this)"
                     data-route="{{ route('cart.add', ['product' => $product->id]) }}"
                     data-product-id="{{ $product->id }}">
@@ -169,18 +155,13 @@
         <div class="col-12">
             <ul class="nav nav-tabs product-tabs border-0" id="productTabs" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="desc-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab" aria-controls="description" aria-selected="true" style="background-color: #e0d0a7;">
+                    <button class="nav-link active" id="desc-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab" aria-controls="description" aria-selected="true">
                         Description
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="manuf-tab" data-bs-toggle="tab" data-bs-target="#manufacturer" type="button" role="tab" aria-controls="manufacturer" aria-selected="false">
                         Manufacturer
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab" aria-controls="reviews" aria-selected="false">
-                        Reviews ({{ $reviews->count() }})
                     </button>
                 </li>
             </ul>
@@ -201,32 +182,227 @@
                     <p class="text-muted">Manufacturer details are not available for this product.</p>
                     @endif
                 </div>
-
-                {{-- Reviews Tab Content --}}
-                <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
-                    @forelse($reviews as $review)
-                    <div class="review-item border-bottom py-3">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h6 class="fw-bold mb-1">{{ $review->user->name ?? 'Anonymous User' }}</h6>
-                            <div class="text-warning small">
-                                @for ($i = 1; $i <= 5; $i++)
-                                    <i class="fas fa-star {{ $review->rating >= $i ? '' : 'far' }}"></i>
-                                    @endfor
-                            </div>
-                        </div>
-                        <p class="small text-muted">{{ $review->created_at->diffForHumans() }}</p>
-                        <p>{{ $review->comment }}</p>
-                    </div>
-                    @empty
-                    <p class="text-muted">No reviews yet. Be the first to review this product!</p>
-                    @endforelse
-                </div>
             </div>
         </div>
     </div>
 </div>
 
 @endsection
+@push('styles')
+<style>
+    :root {
+        --theme: #DB4444;
+        --theme-dark: #b73232;
+        --gold: #f3d9a4;
+        --soft-bg: #fafafa;
+    }
+
+    /* ---------------------------------------------------
+        PRODUCT IMAGE SECTION (Premium Apple-Style Layout)
+    --------------------------------------------------- */
+    .product-image-gallery {
+        width: 100%;
+        background: white;
+        padding: 30px;
+        border-radius: 18px;
+        /* border: 1px solid #eee; */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        /* box-shadow: 0px 6px 25px rgba(0, 0, 0, 0.07); */
+        /* transition: 0.3s; */
+    }
+
+    /* .product-image-gallery:hover {
+        transform: translateY(-3px);
+        box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.12);
+    } */
+
+    .product-image-gallery img {
+        width: 100%;
+        max-width: 550px;
+        height: 550px;
+        object-fit: contain;
+        transition: 0.3s ease;
+    }
+
+    /* .product-image-gallery img:hover {
+        transform: scale(1.07);
+    } */
+
+    /* ---------------------------------------------------
+        TITLE + PRICE
+    --------------------------------------------------- */
+    .product-details-actions h1 {
+        font-size: 38px;
+        font-weight: 800;
+        margin-bottom: 12px;
+        line-height: 1.2;
+    }
+
+    .product-details-actions h2 {
+        color: var(--theme);
+        font-size: 32px;
+        font-weight: 900;
+        margin: 18px 0;
+    }
+
+    /* ---------------------------------------------------
+        SOLD BADGE (SUPER PREMIUM)
+    --------------------------------------------------- */
+    .sold-badge {
+        background: rgba(219, 68, 68, 0.1);
+        padding: 8px 18px;
+        border-radius: 40px;
+        font-size: 15px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 700;
+        color: var(--theme);
+        border: 1px solid rgba(219, 68, 68, 0.2);
+    }
+
+    .sold-badge:before {
+        content: "🔥";
+        font-size: 18px;
+        animation: pulse 1.2s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+        50% {
+            transform: scale(1.2);
+        }
+    }
+
+    /* ---------------------------------------------------
+        QUANTITY SELECTOR
+    --------------------------------------------------- */
+    .input-group input {
+        height: 42px;
+        font-size: 17px;
+        border-color: #ddd;
+    }
+
+    .input-group button {
+        width: 40px;
+        border-color: #ddd;
+        background: #f8f8f8;
+        font-weight: bold;
+        transition: 0.25s;
+    }
+
+    .input-group button:hover {
+        background: var(--theme);
+        border-color: var(--theme);
+        color: #fff;
+    }
+
+    /* ---------------------------------------------------
+        BUTTONS (Luxury eCommerce Style)
+    --------------------------------------------------- */
+    .btn-add-cart {
+        background: var(--theme);
+        color: #fff;
+        padding: 14px 35px !important;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: .5px;
+        box-shadow: 0px 4px 12px rgba(219, 68, 68, 0.25);
+        transition: 0.3s ease;
+    }
+
+    .btn-add-cart:hover {
+        background: var(--theme-dark);
+        transform: translateY(-4px);
+        box-shadow: 0px 6px 18px rgba(219, 68, 68, 0.35);
+    }
+
+    .btn-buy-now {
+        background: var(--theme);
+        color: #fff;
+        padding: 14px 35px !important;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: .5px;
+        box-shadow: 0px 4px 12px rgba(219, 68, 68, 0.25);
+        transition: 0.3s ease;
+    }
+
+    .btn-add-cart:hover {
+        background: var(--theme-dark);
+        transform: translateY(-4px);
+        box-shadow: 0px 6px 18px rgba(219, 68, 68, 0.35);
+    }
+
+
+    /* ---------------------------------------------------
+        WISHLIST
+    --------------------------------------------------- */
+    .wishlist-link {
+        margin-top: 12px;
+        font-size: 15px;
+        text-decoration: none;
+        color: #777;
+        transition: 0.3s;
+    }
+
+    .wishlist-link:hover {
+        color: var(--theme);
+    }
+
+    /* ---------------------------------------------------
+        TABS (Premium Underline Tabs)
+    --------------------------------------------------- */
+    .product-tabs .nav-link {
+        padding: 12px 30px;
+        background: transparent;
+        border: none;
+        font-weight: 700;
+        color: #444;
+        font-size: 16px;
+        position: relative;
+    }
+
+    .product-tabs .nav-link.active {
+        color: var(--theme);
+    }
+
+    .product-tabs .nav-link.active::after {
+        content: "";
+        position: absolute;
+        bottom: -2px;
+        left: 20%;
+        width: 60%;
+        height: 3px;
+        background: var(--theme);
+        border-radius: 50px;
+    }
+
+    .tab-content {
+        background: #fff;
+        /* border: 1px solid #eee; */
+        padding: 28px;
+        /* border-radius: 14px; */
+        box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.05);
+        margin-top: -2px;
+    }
+
+    /* ---------------------------------------------------
+        PAGE SPACING
+    --------------------------------------------------- */
+    .row.mb-5.pb-5.border-bottom {
+        margin-bottom: 40px !important;
+        padding-bottom: 40px !important;
+    }
+
+    .breadcrumb-item a {
+        color: #DB4444 !important;
+    }
+</style>
+@endpush
 
 @push('scripts')
 <script>

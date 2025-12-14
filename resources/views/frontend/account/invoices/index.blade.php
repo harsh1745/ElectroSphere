@@ -42,7 +42,7 @@
                     <td>{{ $order->created_at->format('d M, Y') }}</td>
 
                     {{-- 3. Total Amount --}}
-                    <td>${{ number_format($order->total_amount, 2) }}</td>
+                    <td>₹{{ number_format($order->total_amount, 2) }}</td>
 
                     {{-- 4. Payment Method --}}
                     <td>{{ strtoupper($order->payment_method ?? 'N/A') }}</td>

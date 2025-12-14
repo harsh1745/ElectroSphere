@@ -68,8 +68,8 @@
                                         <span class="fw-semibold">{{ $item->product->name ?? 'Product Not Found' }}</span>
                                     </td>
                                     <td class="text-center">{{ $item->quantity }}</td>
-                                    <td class="text-end">${{ number_format($item->price, 2) }}</td>
-                                    <td class="text-end fw-bold">${{ number_format($item->price * $item->quantity, 2) }}</td>
+                                    <td class="text-end">₹{{ number_format($item->price, 2) }}</td>
+                                    <td class="text-end fw-bold">₹{{ number_format($item->price * $item->quantity, 2) }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -78,17 +78,17 @@
                                 <tr>
                                     <td colspan="4" class="text-end">Subtotal:</td>
                                     {{-- ✅ FIX 2: Order model se subtotal use karein (Agar Controller mein save hua hai) --}}
-                                    <td class="text-end fw-bold">${{ number_format($order->subtotal ?? 0, 2) }}</td>
+                                    <td class="text-end fw-bold">₹{{ number_format($order->subtotal ?? 0, 2) }}</td>
                                 </tr>
                                 <tr>
                                     <td colspan="4" class="text-end">Shipping:</td>
                                     {{-- ✅ FIX 2: Order model se shipping cost use karein --}}
-                                    <td class="text-end fw-bold">${{ number_format($order->shipping_cost ?? 0, 2) }}</td>
+                                    <td class="text-end fw-bold">₹{{ number_format($order->shipping_cost ?? 0, 2) }}</td>
                                 </tr>
                                 <tr class="fs-5">
                                     <td colspan="4" class="text-end fw-bold">Grand Total:</td>
                                     {{-- Grand Total --}}
-                                    <td class="text-end text-danger fw-bolder">${{ number_format($order->total_amount, 2) }}</td>
+                                    <td class="text-end text-danger fw-bolder">₹{{ number_format($order->total_amount, 2) }}</td>
                                 </tr>
                             </tfoot>
                         </table>

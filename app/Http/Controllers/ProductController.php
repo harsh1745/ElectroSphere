@@ -104,4 +104,5 @@ class ProductController extends Controller
         // ✅ FIX: Default 'success' alert message ko hatakar 'admin_toast' use kiya
         return redirect()->route('admin.products.index')->with('admin_toast', 'Product deleted successfully!');
     }
+    
 }
