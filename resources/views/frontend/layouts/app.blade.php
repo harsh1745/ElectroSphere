@@ -33,27 +33,39 @@
         <div id="app">
 
             <!-- 1. Top Black Banner -->
-            <div class="top-banner">
-                <div class="container d-flex justify-content-end align-items-center">
-                    <!-- Banner Text -->
-                    <span class="text-center mx-auto d-none d-md-block">
-                        Summer Sale For All Swim Suits And Free Express Delivery - OFF 50%! <a href="#" class="text-white text-decoration-underline ms-2">ShopNow</a>
-                    </span>
+            <!-- ================= TOP INFO BAR ================= -->
+            <div class="top-info-bar">
+                <div class="container d-flex align-items-center justify-content-between">
 
-                    <!-- Language Dropdown -->
-                    <div class="ms-auto me-0">
-                        <div class="dropdown">
-                            <a class="text-white dropdown-toggle text-decoration-none" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                English
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm" style="font-size: 0.8rem;">
-                                <li><a class="dropdown-item" href="#">Hindi</a></li>
-                                <li><a class="dropdown-item" href="#">Spanish</a></li>
-                            </ul>
-                        </div>
+                    <!-- Center Promo Text -->
+                    <div class="top-info-text mx-auto d-none d-md-block">
+                        Summer Sale For All Swim Suits And Free Express Delivery —
+                        <strong>OFF 50%</strong>
+                        <a href="{{ route('shop.index') }}">ShopNow</a>
                     </div>
+
+                    <!-- Mobile Text -->
+                    <div class="top-info-text d-block d-md-none mx-auto">
+                        Flat 50% OFF <a href="{{ route('shop.index') }}">Shop</a>
+                    </div>
+
+                    <!-- Language -->
+                    <!-- <div class="top-info-lang ms-auto">
+            <div class="dropdown">
+                <a class="dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                    English
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="#">Hindi</a></li>
+                    <li><a class="dropdown-item" href="#">Spanish</a></li>
+                </ul>
+            </div>
+        </div> -->
+
                 </div>
             </div>
+            <!-- ================= TOP INFO BAR END ================= -->
+
 
             <!-- 2. Main Navbar -->
             <nav class="navbar navbar-expand-lg navbar-light bg-white main-navbar">

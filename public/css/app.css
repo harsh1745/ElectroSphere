@@ -8,19 +8,73 @@ body {
 /* ---------------------------------------------------------------------- */
 /* --- 2. Top Black Banner --- */
 /* ---------------------------------------------------------------------- */
-.top-banner {
-    background-color: #000;
-    color: #fff;
+/* ================================================== */
+/* TOP INFO BAR – CLEAN BLACK PREMIUM STYLE */
+/* ================================================== */
+
+.top-info-bar {
+    background: linear-gradient(180deg, #0b0b0b, #000);
+    color: #eaeaea;
     font-size: 0.75rem;
-    padding: 0.5rem 0;
-    height: 48px;
+    height: 44px;
     display: flex;
     align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 
-.top-banner a {
+/* Center text */
+.top-info-text {
+    font-weight: 400;
+    letter-spacing: 0.3px;
+    color: #dcdcdc;
+}
+
+/* Highlight offer */
+.top-info-text strong {
+    color: #ffffff;
     font-weight: 600;
 }
+
+/* CTA */
+.top-info-text a {
+    color: #ffffff;
+    font-weight: 600;
+    margin-left: 6px;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.top-info-text a:hover {
+    opacity: 0.85;
+}
+
+/* Language dropdown */
+.top-info-lang a {
+    color: #eaeaea;
+    font-size: 0.75rem;
+    text-decoration: none;
+}
+
+.top-info-lang a:hover {
+    color: #ffffff;
+}
+
+/* Dropdown menu */
+.top-info-bar .dropdown-menu {
+    font-size: 0.75rem;
+    border-radius: 8px;
+    border: none;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+/* Mobile adjustment */
+@media (max-width: 768px) {
+    .top-info-bar {
+        font-size: 0.7rem;
+        height: 40px;
+    }
+}
+
 
 /* ---------------------------------------------------------------------- */
 /* --- 3. Main Navigation --- */
