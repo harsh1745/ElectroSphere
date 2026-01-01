@@ -367,13 +367,11 @@ window.showCartToast = function (message) {
  */
 window.addToCart = function (element) {
     if (!window.IS_AUTHENTICATED) {
-        // alert('Please login to add products to your cart!');
-        // ➡️ ALERT REPLACED
         window.showErrorAlert('Login Required!', 'Please login to add products to your cart!');
         return;
     }
 
-    const url = element.dataset.route; // Button par route URL set karna hoga
+    const url = element.dataset.route;
     const quantityInput = element.closest('.product-details-actions')?.querySelector('input[name="quantity"]') || 1;
     const quantity = parseInt(quantityInput.value) || 1;
 
@@ -394,11 +392,9 @@ window.addToCart = function (element) {
         })
         .then(data => {
             if (data.status === 'success') {
-                // ✅ ALERT HATA DIYA, AB TOAST SHOW HOGA!
                 const message = `Product successfully ${data.action} to cart. Total items: ${data.count}.`;
-                window.showCartToast(message); // Toast call
+                window.showCartToast(message);
 
-                // Navbar Count Update
                 const counter = document.getElementById('cart-count');
                 if (counter && data.count !== undefined) {
                     counter.textContent = data.count;
@@ -407,8 +403,6 @@ window.addToCart = function (element) {
         })
         .catch(error => {
             console.error('Cart Error:', error);
-            // alert('Could not add to cart. Please try again.');
-            // ➡️ ALERT REPLACED
             window.showErrorAlert('Update Failed!', 'Could not add to cart. Please try again.');
         });
 };
@@ -668,24 +662,24 @@ window.moveFromWishlistToCart = function (button) {
             // Check remaining rows in wishlist table body
             const remaining = document.querySelectorAll("tbody tr").length;
 
-if (remaining === 0) {
-    const tableBox = document.getElementById("wishlist-table-wrapper");
-    const emptyBox = document.getElementById("wishlist-empty-box");
+            if (remaining === 0) {
+                const tableBox = document.getElementById("wishlist-table-wrapper");
+                const emptyBox = document.getElementById("wishlist-empty-box");
 
-    // fade-out animation
-    tableBox.style.opacity = "1";
-    tableBox.style.transition = "opacity 0.3s";
+                // fade-out animation
+                tableBox.style.opacity = "1";
+                tableBox.style.transition = "opacity 0.3s";
 
-    setTimeout(() => {
-        tableBox.style.opacity = "0";
-    }, 10);
+                setTimeout(() => {
+                    tableBox.style.opacity = "0";
+                }, 10);
 
-    // After fade, hide table and show empty UI
-    setTimeout(() => {
-        tableBox.style.display = "none";
-        emptyBox.style.display = "block";
-    }, 300);
-}
+                // After fade, hide table and show empty UI
+                setTimeout(() => {
+                    tableBox.style.display = "none";
+                    emptyBox.style.display = "block";
+                }, 300);
+            }
 
             // show success
             if (typeof Swal !== 'undefined') {

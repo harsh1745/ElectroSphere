@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
@@ -26,11 +27,26 @@ class CategoryController extends Controller
     }
 
     // Category database mein save karne ke liye (Pehle se मौजूद है)
+    // public function store(Request $request)
+    // {
+    //     // ... validation and insertion logic ...
+
+    //     // Ab redirect theek se kaam karega!
+    //     return redirect()->route('admin.categories.index')
+    //         ->with('success', 'Category added successfully!');
+    // }
     public function store(Request $request)
     {
-        // ... validation and insertion logic ...
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
 
-        // Ab redirect theek se kaam karega!
+        Category::create([
+            'name' => $request->name,
+            'description' => $request->description,
+        ]);
+
         return redirect()->route('admin.categories.index')
             ->with('success', 'Category added successfully!');
     }

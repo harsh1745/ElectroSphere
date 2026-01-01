@@ -50,7 +50,6 @@
                     {{-- 5. Status --}}
                     <td>
                         @php
-                        // ✅ Dynamic Badge Color Mapping
                         $badgeColor = match($order->status) {
                         'completed' => 'bg-success',
                         'shipped' => 'bg-info',
