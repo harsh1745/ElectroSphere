@@ -1,7 +1,7 @@
 @extends('frontend.layouts.app')
 
 @section('content')
-<div class="container">
+<div class="container mt-3">
     <h2>Edit My Account</h2>
 
     <form action="{{ route('account.update') }}" method="POST">
@@ -40,7 +40,7 @@
 
 
         <button class="btn btn-success mt-3">Save Changes</button>
-        <a href="{{ route('account') }}" class="btn btn-secondary mt-3">Cancel</a>
+        <a href="{{ route('account.index') }}" class="btn btn-secondary mt-3">Cancel</a>
     </form>
 </div>
 @endsection

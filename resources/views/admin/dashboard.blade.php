@@ -118,7 +118,7 @@
 
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-        <h2 class="fw-bold text-dark mb-0">📊 Dashboard Overview</h2>
+        <h2 class="fw-bold text-dark mb-0"> Dashboard Overview</h2>
         <a href="{{ route('admin.products.index') }}" class="btn btn-outline-danger d-flex align-items-center shadow-sm">
             <i class="fas fa-box me-2"></i> View Products
         </a>
@@ -180,23 +180,62 @@
     </div>
 
 
-    <!-- Chart + Recent Orders -->
+    <!-- ================= ROW 1 : TWO CHARTS SIDE BY SIDE ================= -->
     <div class="row g-4">
-        <div class="col-lg-8">
-            <div class="chart-card">
+
+        <!-- MONTHLY CHART -->
+        <div class="col-lg-6 col-md-12">
+            <div class="chart-card h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
+
                     <div>
-                        <h5 class="mb-0">Monthly Orders & Revenue ({{ $currentYear }})</h5>
-                        <small class="small-muted">Orders (bar) vs Revenue (line)</small>
+                        <h6 class="mb-0">Monthly Orders & Revenue ({{ $selectedYear }})</h6>
+
+                        <small class="small-muted">Orders vs Revenue</small>
+                        <small class="small-muted">Year-wise data</small>
                     </div>
-                    <div class="small-muted">Total Revenue: <strong class="accent">₹{{ number_format($totalRevenue,2) }}</strong></div>
+                    <!-- YEAR DROPDOWN -->
+                    <form method="GET">
+                        <select name="year"
+                            class="form-select form-select-sm"
+                            onchange="this.form.submit()">
+                            @for($year = 2025; $year <= 2030; $year++)
+                                <option value="{{ $year }}"
+                                {{ $selectedYear == $year ? 'selected' : '' }}>
+                                {{ $year }}
+                                </option>
+                                @endfor
+                        </select>
+                    </form>
+                    <div class="small-muted">
+                        <strong class="accent">₹{{ number_format($totalRevenue,2) }}</strong>
+                    </div>
                 </div>
 
-                <canvas id="ordersRevenueChart"></canvas>
+                <canvas id="monthlyChart"></canvas>
             </div>
         </div>
 
-        <div class="col-lg-4">
+        <!-- DAILY CHART -->
+        <div class="col-lg-6 col-md-12">
+            <div class="chart-card h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h6 class="mb-0">Daily Orders & Revenue ({{ now()->format('F Y') }})</h6>
+                        <small class="small-muted">Day-wise performance</small>
+                    </div>
+                </div>
+
+                <canvas id="dailyChart"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ================= ROW 2 : RECENT ORDERS (FULL WIDTH) ================= -->
+    <div class="row g-4 mt-1">
+
+        <div class="col-12">
             <div class="card-ghost">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <h6 class="mb-0">Recent Orders</h6>
@@ -206,15 +245,19 @@
                 <div>
                     @forelse($recentOrders as $order)
                     <div class="list-item">
-                        <div class="left">
-                            <div>
-                                <div style="font-weight:700;">{{ $order->order_number ?? '#'.$order->id }}</div>
-                                <div class="small-muted">{{ $order->user->name ?? 'Guest' }}</div>
+                        <div>
+                            <div class="fw-bold">
+                                {{ $order->order_number ?? '#'.$order->id }}
+                            </div>
+                            <div class="small-muted">
+                                {{ $order->user->name ?? 'Guest' }}
                             </div>
                         </div>
 
                         <div class="text-end">
-                            <div class="small-muted">₹{{ number_format($order->total_amount,2) }}</div>
+                            <div class="small-muted">
+                                ₹{{ number_format($order->total_amount,2) }}
+                            </div>
                             @php
                             $badge = match($order->status) {
                             'completed' => 'success',
@@ -226,7 +269,9 @@
                             default => 'secondary',
                             };
                             @endphp
-                            <div class="mt-1"><span class="badge bg-{{ $badge }}">{{ ucfirst($order->status) }}</span></div>
+                            <span class="badge bg-{{ $badge }}">
+                                {{ ucfirst($order->status) }}
+                            </span>
                         </div>
                     </div>
                     @empty
@@ -243,113 +288,137 @@
                     </div>
                     @endforeach
                 </div>
-
             </div>
         </div>
+
     </div>
+
+
 </div>
 @endsection
 @php
 $monthsJson = json_encode($months);
-$ordersJson = json_encode($ordersByMonth);
-$revenueJson = json_encode($revenueByMonth);
+$ordersMonthJson = json_encode($ordersByMonth);
+$revenueMonthJson = json_encode($revenueByMonth);
+
+$daysJson = json_encode($days);
+$ordersDayJson = json_encode($ordersByDay);
+$revenueDayJson = json_encode($revenueByDay);
 @endphp
+
+
 @push('scripts')
-<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
+    // =======================
+    // DATA
+    // =======================
     const months = JSON.parse('{!! $monthsJson !!}');
-    const ordersData = JSON.parse('{!! $ordersJson !!}');
-    const revenueData = JSON.parse('{!! $revenueJson !!}');
-    const ctx = document.getElementById('ordersRevenueChart').getContext('2d');
+    const ordersMonth = JSON.parse('{!! $ordersMonthJson !!}');
+    const revenueMonth = JSON.parse('{!! $revenueMonthJson !!}');
 
-    const ordersRevenueChart = new Chart(ctx, {
-        data: {
-            labels: months,
-            datasets: [{
-                    type: 'bar',
-                    label: 'Orders',
-                    data: ordersData,
-                    backgroundColor: 'rgba(219,68,68,0.9)', // red
-                    borderRadius: 6,
-                    yAxisID: 'y',
-                },
-                {
-                    type: 'line',
-                    label: 'Revenue (₹)',
-                    data: revenueData,
-                    borderColor: '#DB4444',
-                    backgroundColor: 'rgba(219,68,68,0.12)',
-                    tension: 0.35,
-                    fill: true,
-                    pointRadius: 3,
-                    pointBackgroundColor: '#DB4444',
-                    yAxisID: 'y1'
-                }
-            ]
-        },
-        options: {
+    const days = JSON.parse('{!! $daysJson !!}');
+    const ordersDay = JSON.parse('{!! $ordersDayJson !!}');
+    const revenueDay = JSON.parse('{!! $revenueDayJson !!}');
+
+    // =======================
+    // COMMON OPTIONS
+    // =======================
+    function chartOptions() {
+        return {
             responsive: true,
-            maintainAspectRatio: true,
             interaction: {
                 mode: 'index',
                 intersect: false
             },
             plugins: {
-                legend: {
-                    labels: {
-                        color: '#111'
-                    }
-                },
                 tooltip: {
                     callbacks: {
-                        label: function(context) {
-                            let label = context.dataset.label || '';
-                            if (context.dataset.type === 'line') {
-                                return label + ': ₹' + Number(context.parsed.y).toLocaleString();
-                            }
-                            return label + ': ' + Number(context.parsed.y).toLocaleString();
+                        label: ctx => {
+                            const label = ctx.dataset.label;
+                            const val = ctx.parsed.y.toLocaleString();
+                            return label.includes('Revenue') ?
+                                `${label}: ₹${val}` :
+                                `${label}: ${val}`;
                         }
                     }
                 }
             },
             scales: {
                 y: {
-                    type: 'linear',
-                    position: 'left',
-                    beginAtZero: true,
-                    ticks: {
-                        color: '#444'
-                    },
-                    grid: {
-                        color: 'rgba(0,0,0,0.03)'
-                    }
+                    beginAtZero: true
                 },
                 y1: {
-                    type: 'linear',
-                    position: 'right',
                     beginAtZero: true,
+                    position: 'right',
                     grid: {
                         drawOnChartArea: false
                     },
                     ticks: {
-                        color: '#444',
-                        callback: function(value) {
-                            return '₹' + value.toLocaleString();
-                        }
-                    }
-                },
-                x: {
-                    ticks: {
-                        color: '#444'
-                    },
-                    grid: {
-                        display: false
+                        callback: v => '₹' + v.toLocaleString()
                     }
                 }
             }
-        }
+        };
+    }
+
+    // =======================
+    // MONTHLY CHART ✅
+    // =======================
+    new Chart(document.getElementById('monthlyChart'), {
+        data: {
+            labels: months,
+            datasets: [{
+                    type: 'bar',
+                    label: 'Orders',
+                    data: ordersMonth,
+                    backgroundColor: 'rgba(219,68,68,0.9)',
+                    borderRadius: 6,
+                    yAxisID: 'y'
+                },
+                {
+                    type: 'line',
+                    label: 'Revenue (₹)',
+                    data: revenueMonth,
+                    borderColor: '#DB4444',
+                    backgroundColor: 'rgba(219,68,68,0.12)',
+                    fill: true,
+                    tension: 0.35,
+                    yAxisID: 'y1'
+                }
+            ]
+        },
+        options: chartOptions()
+    });
+
+    // =======================
+    // DAILY CHART ✅
+    // =======================
+    new Chart(document.getElementById('dailyChart'), {
+        data: {
+            labels: days,
+            datasets: [{
+                    type: 'bar',
+                    label: 'Orders',
+                    data: ordersDay,
+                    backgroundColor: 'rgba(219,68,68,0.85)',
+                    borderRadius: 6,
+                    yAxisID: 'y'
+                },
+                {
+                    type: 'line',
+                    label: 'Revenue (₹)',
+                    data: revenueDay,
+                    borderColor: '#DB4444',
+                    backgroundColor: 'rgba(219,68,68,0.12)',
+                    fill: true,
+                    tension: 0.35,
+                    yAxisID: 'y1'
+                }
+            ]
+        },
+        options: chartOptions()
     });
 </script>
 @endpush

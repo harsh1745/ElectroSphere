@@ -180,6 +180,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/about', [AboutController::class, 'index'])->name('about');
     // FRONTEND PRODUCT DETAIL PAGE
     Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show');
+    Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 });
 
 // =========================================================================================

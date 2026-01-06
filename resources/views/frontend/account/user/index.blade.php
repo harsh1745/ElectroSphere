@@ -1,6 +1,8 @@
 @extends('frontend.layouts.app')
 
 @section('title', 'My Account')
+<div id="auth-status" data-is-auth="{{ Auth::check() ? 'true' : 'false' }}" style="display:none;"></div>
+<div id="csrf-token-data" data-token="{{ csrf_token() }}" style="display:none;"></div>
 
 @section('content')
 

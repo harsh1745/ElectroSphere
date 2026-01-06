@@ -20,8 +20,8 @@ class AdminUserSeeder extends Seeder
             // ADMINS table mein data store karein
             // NOTE: 'name' FIELD HATA DIYA GAYA HAI KYUNKI WOH TABLE MEIN NAHI HAI
             DB::table('admins')->insert([
-                'email' => 'admin@example.com', // Yahi aapka login email hoga
-                'password' => Hash::make('password'), 
+                'email' => 'hs@admin.com', // Yahi aapka login email hoga
+                'password' => Hash::make('hs12345'), // Aapka login password
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ]);

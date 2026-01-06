@@ -192,7 +192,7 @@
                 <div class="mb-3">
                     <input id="email" type="text" class="form-control @error('email') is-invalid @enderror" name="email"
                         value="{{ old('email') }}" required autocomplete="email" autofocus
-                        placeholder="Email or Phone Number">
+                        placeholder="Enter your email   ">
 
                     @error('email')
                     <span class="invalid-feedback" role="alert">
@@ -257,4 +257,5 @@
         }
     });
 </script>
+<script src="{{ asset('js/shop.js') }}"></script>
 @endsection

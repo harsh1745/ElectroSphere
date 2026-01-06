@@ -184,10 +184,10 @@ $maxPrice = $maxPrice ?? '';
                         </div>
                         <div class="product-info text-center p-3">
                             <h6 class="product-name fw-semibold text-dark mb-2">{{ $product->name }}</h6>
-                            <div class="star-rating mb-1">
+                            <!-- <div class="star-rating mb-1">
                                 <i class="fas fa-star"></i><i class="fas fa-star"></i>
                                 <i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i><i class="far fa-star"></i>
-                            </div>
+                            </div> -->
                             <p class="product-price mb-0 text-danger fw-bold">₹{{ number_format($product->price, 2) }}</p>
                         </div>
                     </div>
@@ -202,9 +202,12 @@ $maxPrice = $maxPrice ?? '';
                 @endforelse
             </div>
 
-            <div class="d-flex justify-content-center mt-4">
-                {{ $products->links() }}
+            <div class="shop-pagination-wrapper mt-4">
+                {{ $products->onEachSide(1)->links('pagination::bootstrap-5') }}
             </div>
+
+
+
         </div>
 
     </div>

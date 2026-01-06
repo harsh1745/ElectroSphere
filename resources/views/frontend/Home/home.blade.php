@@ -72,21 +72,31 @@ $recommendedProducts = Product::inRandomOrder()->take(6)->get();
         <div class="row g-4">
             @php
             $cats = [
-            ['Phones', 'Category-CellPhone.svg'],
-            ['Computers', 'Category-Computer.svg'],
-            ['SmartWatch', 'Category-SmartWatch.svg'],
-            ['Camera', 'Category-Camera.svg'],
-            ['HeadPhones', 'Category-Headphone.svg'],
-            ['Gaming', 'Category-Gamepad.svg']
+                ['Phones', 'Category-CellPhone.svg'],
+                ['Computers', 'Category-Computer.svg'],
+                ['SmartWatch', 'Category-SmartWatch.svg'],
+                ['Camera', 'Category-Camera.svg'],
+                ['HeadPhones', 'Category-Headphone.svg'],
+                ['Gaming', 'Category-Gamepad.svg']
             ];
             @endphp
 
             @foreach ($cats as $cat)
             <div class="col-lg-2 col-md-4 col-6">
-                <div class="card text-center h-100 p-4 category-card-outline">
-                    <img src="{{ asset('images/' . $cat[1]) }}" class="img-fluid mb-3 category-img">
-                    <p class="fw-semibold mb-0">{{ $cat[0] }}</p>
-                </div>
+
+                <!-- ✅ SIMPLE CLICK → SHOP PAGE -->
+                <a href="{{ route('shop.index') }}"
+                   class="text-decoration-none text-dark">
+
+                    <div class="card text-center h-100 p-4 category-card-outline">
+                        <img src="{{ asset('images/' . $cat[1]) }}"
+                             class="img-fluid mb-3 category-img"
+                             alt="{{ $cat[0] }}">
+                        <p class="fw-semibold mb-0">{{ $cat[0] }}</p>
+                    </div>
+
+                </a>
+
             </div>
             @endforeach
         </div>

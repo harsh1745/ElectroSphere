@@ -14,64 +14,110 @@ use App\Models\Order;
 class DashboardController extends Controller
 {
     public function index(Request $request)
-    {
-        // Totals
-        $userCount = User::count();
-        $productCount = Product::count();
-        $categoryCount = Category::count();
-        $orderCount = Order::count();
-        $totalRevenue = (float) Order::sum('total_amount');
+{
+    // ✅ Selected year (dropdown se aayega)
+    $selectedYear = $request->get('year', now()->year);
 
-        // Months labels (Jan..Dec)
-        $months = collect(range(1, 12))->map(function ($m) {
-            return Carbon::createFromDate(null, $m, 1)->format('M');
-        })->toArray();
+    // =======================
+    // BASIC TOTALS
+    // =======================
+    $userCount = User::count();
+    $productCount = Product::count();
+    $categoryCount = Category::count();
+    $orderCount = Order::count();
 
-        $currentYear = now()->year;
+    // 👉 Revenue ab selected year ka
+    $totalRevenue = (float) Order::whereYear('created_at', $selectedYear)
+        ->sum('total_amount');
 
-        // Orders grouped by month for the current year
-        $ordersByMonthRaw = Order::selectRaw('MONTH(created_at) as month, COUNT(*) as total')
-            ->whereYear('created_at', $currentYear)
-            ->groupBy('month')
-            ->pluck('total', 'month')
-            ->toArray();
+    // =======================
+    // MONTHLY CHART DATA (SELECTED YEAR)
+    // =======================
+    $months = collect(range(1, 12))->map(function ($m) {
+        return Carbon::createFromDate(null, $m, 1)->format('M');
+    })->toArray();
 
-        // Revenue grouped by month for the current year
-        $revenueByMonthRaw = Order::selectRaw('MONTH(created_at) as month, COALESCE(SUM(total_amount),0) as revenue')
-            ->whereYear('created_at', $currentYear)
-            ->groupBy('month')
-            ->pluck('revenue', 'month')
-            ->toArray();
+    $ordersByMonthRaw = Order::selectRaw('MONTH(created_at) as month, COUNT(*) as total')
+        ->whereYear('created_at', $selectedYear)
+        ->groupBy('month')
+        ->pluck('total', 'month')
+        ->toArray();
 
-        // Normalize months - fill 0 if missing
-        $ordersByMonth = [];
-        $revenueByMonth = [];
-        foreach (range(1, 12) as $m) {
-            $ordersByMonth[] = isset($ordersByMonthRaw[$m]) ? (int)$ordersByMonthRaw[$m] : 0;
-            $revenueByMonth[] = isset($revenueByMonthRaw[$m]) ? (float)$revenueByMonthRaw[$m] : 0.0;
-        }
+    $revenueByMonthRaw = Order::selectRaw('MONTH(created_at) as month, COALESCE(SUM(total_amount),0) as revenue')
+        ->whereYear('created_at', $selectedYear)
+        ->groupBy('month')
+        ->pluck('revenue', 'month')
+        ->toArray();
 
-        // Recent orders (latest 5) - eager load user
-        $recentOrders = Order::with('user')->latest()->take(5)->get();
+    $ordersByMonth = [];
+    $revenueByMonth = [];
 
-        // Orders by status (for small pie or stats)
-        $ordersByStatus = Order::select('status', DB::raw('COUNT(*) as total'))
-            ->groupBy('status')
-            ->pluck('total', 'status')
-            ->toArray();
-
-        return view('admin.dashboard', [
-            'userCount' => $userCount,
-            'productCount' => $productCount,
-            'categoryCount' => $categoryCount,
-            'orderCount' => $orderCount,
-            'totalRevenue' => $totalRevenue,
-            'months' => $months,
-            'ordersByMonth' => $ordersByMonth,
-            'revenueByMonth' => $revenueByMonth,
-            'recentOrders' => $recentOrders,
-            'ordersByStatus' => $ordersByStatus,
-            'currentYear' => $currentYear,
-        ]);
+    foreach (range(1, 12) as $m) {
+        $ordersByMonth[] = $ordersByMonthRaw[$m] ?? 0;
+        $revenueByMonth[] = $revenueByMonthRaw[$m] ?? 0;
     }
+
+    // =======================
+    // DAILY CHART (CURRENT MONTH of SELECTED YEAR)
+    // =======================
+    $currentMonth = now()->month;
+    $daysInMonth = Carbon::now()->daysInMonth;
+    $days = range(1, $daysInMonth);
+
+    $ordersByDayRaw = Order::selectRaw('DAY(created_at) as day, COUNT(*) as total')
+        ->whereYear('created_at', $selectedYear)
+        ->whereMonth('created_at', $currentMonth)
+        ->groupBy('day')
+        ->pluck('total', 'day')
+        ->toArray();
+
+    $revenueByDayRaw = Order::selectRaw('DAY(created_at) as day, COALESCE(SUM(total_amount),0) as revenue')
+        ->whereYear('created_at', $selectedYear)
+        ->whereMonth('created_at', $currentMonth)
+        ->groupBy('day')
+        ->pluck('revenue', 'day')
+        ->toArray();
+
+    $ordersByDay = [];
+    $revenueByDay = [];
+
+    foreach ($days as $d) {
+        $ordersByDay[] = $ordersByDayRaw[$d] ?? 0;
+        $revenueByDay[] = $revenueByDayRaw[$d] ?? 0;
+    }
+
+    // =======================
+    // SIDE DATA
+    // =======================
+    $recentOrders = Order::with('user')->latest()->take(5)->get();
+
+    $ordersByStatus = Order::select('status', DB::raw('COUNT(*) as total'))
+        ->groupBy('status')
+        ->pluck('total', 'status')
+        ->toArray();
+
+    return view('admin.dashboard', compact(
+        'userCount',
+        'productCount',
+        'categoryCount',
+        'orderCount',
+        'totalRevenue',
+
+        // Monthly
+        'months',
+        'ordersByMonth',
+        'revenueByMonth',
+        'selectedYear',
+
+        // Daily
+        'days',
+        'ordersByDay',
+        'revenueByDay',
+
+        // Side
+        'recentOrders',
+        'ordersByStatus'
+    ));
+}
+
 }

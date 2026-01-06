@@ -1,5 +1,3 @@
-{{-- resources/views/frontend/checkout/index.blade.php --}}
-
 @extends('frontend.layouts.app')
 
 @section('title', 'Checkout')
@@ -491,7 +489,6 @@
         box-shadow: 0 0 4px rgba(219, 68, 68, 0.4);
     }
 </style>
-@endphp
 
 @endpush
 @push('scripts')

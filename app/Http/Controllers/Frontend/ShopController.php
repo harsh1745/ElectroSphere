@@ -15,67 +15,74 @@ use Illuminate\Support\Facades\Auth;
 class ShopController extends Controller
 {
     public function index(Request $request)
-    {
-        $categories = Category::all();
-        $productsQuery = Product::query();
+{
+    $categories = Category::all();
+    $productsQuery = Product::query();
 
-        // Get filters
-        $currentCategory = $request->input('category'); // category id
-        $minPrice = $request->input('min_price');
-        $maxPrice = $request->input('max_price');
-
-        // 🧩 Category filter
-        if (!empty($currentCategory) && $currentCategory !== 'all') {
-            $productsQuery->whereHas('category', function ($query) use ($currentCategory) {
-                $query->where('id', $currentCategory);
-            });
-        }
-
-        // 🧩 Price Range filter
-        if (!empty($minPrice)) {
-            $productsQuery->where('price', '>=', $minPrice);
-        }
-
-        if (!empty($maxPrice)) {
-            $productsQuery->where('price', '<=', $maxPrice);
-        }
-
-        // 🧩 Get products (paginate)
-        $products = $productsQuery->paginate(12)->withQueryString();
-
-        // 🧩 Get min & max product price for slider
-        $priceRange = [
-            'min' => Product::min('price'),
-            'max' => Product::max('price')
-        ];
-
-        // 💖 FIX: Wishlist Product IDs ko fetch karna
-        $wishlistProductIds = [];
-        if (Auth::check()) {
-            // Agar user logged in hai, toh uske saare wishlisted product_id database se nikaal lo.
-            $wishlistProductIds = Wishlist::where('user_id', Auth::id())
-                ->pluck('product_id') // Sirf product IDs chahiye
-                ->toArray(); // Blade mein use karne ke liye array bana lo
-        }
-
-        return view('frontend.shop.index', compact(
-            'products',
-            'categories',
-            'currentCategory',
-            'minPrice',
-            'maxPrice',
-            'priceRange',
-            // ✅ Ab 'wishlistProductIds' view ko mil jayega
-            'wishlistProductIds'
-        ));
+    // 🔒 SAME RANDOM ORDER FOR PAGINATION
+    $seed = session()->get('shop_random_seed');
+    if (!$seed) {
+        $seed = rand(1, 100000);
+        session()->put('shop_random_seed', $seed);
     }
+
+    // Get filters
+    $currentCategory = $request->input('category');
+    $minPrice = $request->input('min_price');
+    $maxPrice = $request->input('max_price');
+
+    // 🧩 Category filter
+    if (!empty($currentCategory) && $currentCategory !== 'all') {
+        $productsQuery->where('category_id', $currentCategory);
+    }
+
+    // 🧩 Price Range filter
+    if (!empty($minPrice)) {
+        $productsQuery->where('price', '>=', $minPrice);
+    }
+
+    if (!empty($maxPrice)) {
+        $productsQuery->where('price', '<=', $maxPrice);
+    }
+
+    // 🧩 ONLY AVAILABLE PRODUCTS
+    $productsQuery->where('stock', '>', 0);
+
+    // 🎲 RANDOM ORDER (STABLE)
+    $products = $productsQuery
+        ->orderByRaw("RAND($seed)")
+        ->paginate(12)
+        ->withQueryString();
+
+    // 🧩 Min & Max price for filter UI
+    $priceRange = [
+        'min' => Product::min('price'),
+        'max' => Product::max('price'),
+    ];
+
+    $wishlistProductIds = [];
+    if (Auth::check()) {
+        $wishlistProductIds = Wishlist::where('user_id', Auth::id())
+            ->pluck('product_id')
+            ->toArray();
+    }
+
+    return view('frontend.shop.index', compact(
+        'products',
+        'categories',
+        'currentCategory',
+        'minPrice',
+        'maxPrice',
+        'priceRange',
+        'wishlistProductIds'
+    ));
+}
+
 
     public function show($slug)
     {
-        // Product ko slug se fetch karo
         $product = Product::where('slug', $slug)->firstOrFail();
 
-        // Product reviews (latest 10)
         $reviews = Review::where('product_id', $product->id)
             ->where('status', 'approved')
             ->with('user')
@@ -83,7 +90,6 @@ class ShopController extends Controller
             ->take(10)
             ->get();
 
-        // Wishlist status
         $isWishlisted = false;
         if (Auth::check()) {
             $isWishlisted = Wishlist::where('user_id', Auth::id())

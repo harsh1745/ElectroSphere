@@ -88,7 +88,7 @@
 
         <div class="row g-4">
 
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <div class="team-card shadow rounded-4 p-3">
                     <img src="{{ asset('images/profile-image-new.png') }}" class="team-img">
                     <h5 class="mt-3 fw-bold">Harsh Makwana</h5>
@@ -96,7 +96,7 @@
                 </div>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <div class="team-card shadow rounded-4 p-3">
                     <img src="{{ asset('images/swayam.jpg') }}" class="team-img">
                     <h5 class="mt-3 fw-bold">Swayam Soni</h5>
@@ -104,13 +104,6 @@
                 </div>
             </div>
 
-            <div class="col-md-4">
-                <div class="team-card shadow rounded-4 p-3">
-                    <img src="{{ asset('images/testimonial-2.png') }}" class="team-img">
-                    <h5 class="mt-3 fw-bold">Emma Wilson</h5>
-                    <p class="text-muted">Marketing Manager</p>
-                </div>
-            </div>
 
         </div>
 

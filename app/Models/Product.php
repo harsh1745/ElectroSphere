@@ -47,7 +47,7 @@ class Product extends Model
 
         return Attribute::make(
             get: function () use ($stock) {
-                if ($stock > 500) {
+                if ($stock > 50) {
                     return 'in_stock';
                 } elseif ($stock > 0) { // 1 se 500 tak
                     return 'low_stock';

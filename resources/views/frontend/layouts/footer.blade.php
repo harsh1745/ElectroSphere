@@ -5,7 +5,7 @@
 
             <!-- BRAND INFO -->
             <div class="col-lg-4 col-md-6">
-                <h3 class="fw-bold mb-3">YourStore</h3>
+                <h3 class="fw-bold mb-3">ElectroSphere</h3>
                 <p class="text-light-50">
                     India’s most trusted store for premium electronics & gadgets.
                 </p>
