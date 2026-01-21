@@ -27,16 +27,15 @@ class ProductController extends Controller
     }
 
 
-    public function store(Request $request) // ✅ Request use kiya, agar StoreProductRequest nahi hai
+    public function store(Request $request)
     {
-        // Validation rules
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'category_id' => 'nullable|exists:categories,id',
             'price' => 'required|numeric|min:0.01',
             'description' => 'nullable|string',
             'manufacturer' => 'nullable|string|max:255',
-            'stock' => 'required|integer|min:0', // ✅ Validation mein stock hai
+            'stock' => 'required|integer|min:0',
             'image' => 'nullable|image|max:2048',
         ]);
 
@@ -46,10 +45,8 @@ class ProductController extends Controller
         }
         $validated['image'] = $imagePath;
 
-        // Product::create() mein validated data pass kiya gaya hai
         Product::create($validated);
 
-        // ✅ FIX: Default 'success' alert message ko hatakar 'admin_toast' use kiya
         return redirect()->route('admin.products.index')->with('admin_toast', 'Product added successfully!');
     }
 
@@ -60,48 +57,39 @@ class ProductController extends Controller
     }
 
 
-    public function update(Request $request, Product $product) // ✅ Request use kiya
+    public function update(Request $request, Product $product)
     {
-        // Validation rules
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0.01',
             'description' => 'nullable|string',
             'category_id' => 'nullable|exists:categories,id',
-            // Image is nullable, validation is below
             'manufacturer' => 'nullable|string|max:255',
-            'stock' => 'required|integer|min:0', // ✅ Validation mein stock hai
+            'stock' => 'required|integer|min:0',
             'image' => 'nullable|image|max:2048',
         ]);
 
-        // 2. Image Handling
         if ($request->hasFile('image')) {
-            // Optional: Purana image delete karo
             if ($product->image) {
                 Storage::disk('public')->delete($product->image);
             }
             $validated['image'] = $request->file('image')->store('products', 'public');
         } else {
-            // Agar image field validation mein hai aur file nahi aayi, toh existing image rakho
             $validated['image'] = $product->image;
         }
 
-        // 3. Database mein data save karo
         $product->update($validated);
 
-        // ✅ FIX: Default 'success' alert message ko hatakar 'admin_toast' use kiya
         return redirect()->route('admin.products.index')->with('admin_toast', 'Product updated successfully!');
     }
 
     public function destroy(Product $product)
     {
-        // Optional: Image delete karo
         if ($product->image) {
             Storage::disk('public')->delete($product->image);
         }
 
         $product->delete();
-        // ✅ FIX: Default 'success' alert message ko hatakar 'admin_toast' use kiya
         return redirect()->route('admin.products.index')->with('admin_toast', 'Product deleted successfully!');
     }
     

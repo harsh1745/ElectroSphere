@@ -14,24 +14,15 @@ class Review extends Model
         'product_id',
         'rating',
         'comment',
-        'status', // e.g., 'approved', 'pending'
+        'status',
     ];
 
-    /**
-     * Define relationship with the User model.
-     */
     public function user()
     {
-        // Har review kisi ek user se belong karta hai
         return $this->belongsTo(User::class);
     }
-
-    /**
-     * Define relationship with the Product model.
-     */
     public function product()
     {
-        // Har review kisi ek product se belong karta hai
         return $this->belongsTo(Product::class);
     }
 }

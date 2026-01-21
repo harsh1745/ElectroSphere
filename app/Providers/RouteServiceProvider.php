@@ -14,9 +14,6 @@ class RouteServiceProvider extends ServiceProvider
      */
     public const HOME = '/home';
 
-    /**
-     * Define your route model bindings, pattern filters, etc.
-     */
     public function boot(): void
     {
         $this->routes(function () {

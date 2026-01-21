@@ -25,7 +25,6 @@ class HomeController extends Controller
      */
     public function index()
     {
-        // Top ordered products
         $topProducts = Product::select('products.*')
             ->join('order_items', 'products.id', '=', 'order_items.product_id')
             ->selectRaw('COUNT(order_items.product_id) as total_sold')

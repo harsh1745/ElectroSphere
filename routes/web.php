@@ -7,21 +7,21 @@ use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ContactAdminController;
 use App\Http\Controllers\Admin\LoginController as AdminLoginController;
-use App\Http\Controllers\Auth\LoginController; // ✅ YEH LINE ADD KARO
-use App\Http\Controllers\Frontend\ShopController; // Ensure this is the correct path
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Frontend\ShopController;
 use App\Http\Controllers\Frontend\WishlistController;
 use App\Http\Controllers\Frontend\CartController;
-use App\Http\Controllers\Frontend\ReviewController; // ✅ NEW: Review Controller
-use App\Http\Controllers\Frontend\CheckoutController; // ✅ NEW: Checkout Controller
+use App\Http\Controllers\Frontend\ReviewController;
+use App\Http\Controllers\Frontend\CheckoutController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
-use App\Http\Controllers\Frontend\AddressController; // Naya Controller import karein
+use App\Http\Controllers\Frontend\AddressController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Frontend\AccountController;
 use App\Http\Controllers\Frontend\ForgotController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Controllers\Frontend\InvoiceController; // ✅ Make sure this controller exists and is imported
+use App\Http\Controllers\Frontend\InvoiceController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Frontend\ContactController;
 use App\Http\Controllers\Frontend\AboutController;
@@ -29,43 +29,21 @@ use App\Models\User;
 use App\Models\Product;
 use App\Models\Category;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Yeh file tumhare saare web routes ko register karti hai.
-|
-*/
 
 // --- DEFAULT USER AUTH & HOME ---
 Route::get('/', function () {
     return redirect('/home');
 });
 
-// ✅ 1. YEH PUBLIC HOME PAGE HOGA (Yeh block sahi hai)
 Route::get('/home', function () {
-    // Tum yahaan products fetch kar sakte ho, ya seedha view return kar sakte ho
     return view('frontend.Home.home');
 })->name('home');
 
-// ✅ YEH HAI PUBLIC HOME PAGE (Kahan tum products dikhaoge)
-// Route::get('/home', function () {
-//     // Tum yahaan products fetch kar sakte ho, ya seedha view return kar sakte ho
-//     return view('home');
-// })->name('home');
 
-// Default user login/register, password reset disable hai.
 Auth::routes(['reset' => false, 'email' => false, 'verify' => true]);
-// Route::middleware(['auth'])->group(function () {
-//     Route::get('/home', function () {
-//         return view('home');
-//     })->name('home');
-// });
 
 
-// ✅ CUSTOMER LOGOUT ROUTE ADD KARO
-// Auth::routes() se GET/logout hata diya jata hai, so POST ko explicitly define karna padta hai
+
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 
@@ -91,22 +69,16 @@ Route::get('/storage/products/{filename}', function ($filename) {
         abort(404);
     }
 
-    // File ko read karke browser ko stream karna (403 Forbidden error ko fix karta hai)
     return Storage::response($path);
 })->name('storage.product.show');
 
 
-// --- WISHLIST API (Requires new WishlistController) ---
 Route::middleware(['auth'])->group(function () {
-    // ✅ FIX: Imported Controller class name use kiya gaya
     Route::post('/wishlist/toggle/{product}', [WishlistController::class, 'toggle'])
         ->name('wishlist.toggle');
-    // ✅ NEW: Wishlist Index Route (List of all wishlisted products)
     Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
-    // ✅ NEW: AJAX route to fetch sidebar content
     Route::get('/wishlist/drawer-content', [WishlistController::class, 'getDrawerContent'])->name('wishlist.drawer.content');
 
-    // ✅ NEW CART ROUTES
 
     // 1. Full Cart Page (GET)
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
@@ -114,50 +86,41 @@ Route::middleware(['auth'])->group(function () {
     // 2. Add Item (POST AJAX)
     Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
 
-    // 3. Update Cart Quantities (POST Form submission from cart page)
+    // 3. Update Cart Quantities 
     Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
 
     // 4. Remove Item (DELETE/AJAX from Cart Page)
     Route::delete('/cart/remove/{cartItem}', [CartController::class, 'remove'])->name('cart.remove');
 
-    // ✅ FIX: Instant Quantity Update Route (for AJAX)
+    // 5. FIX: Instant Quantity Update Route (for AJAX)
     Route::post('/cart/update-item/{cartItem}', [CartController::class, 'updateItemQuantity'])->name('cart.update.item');
 
-    // 🎁 NEW: COUPON APPLICATION ROUTE
+    // 6. NEW: COUPON APPLICATION ROUTE
     Route::post('/cart/apply-coupon', [CartController::class, 'applyCoupon'])->name('cart.apply_coupon');
 
-    // 📝 NEW: REVIEW SUBMISSION ROUTE
+    // 7. NEW: REVIEW SUBMISSION ROUTE
     Route::post('/reviews/submit/{product}', [ReviewController::class, 'store'])->name('reviews.store');
 
 
-    // 🛒 NEW: CHECKOUT ROUTE (Used by Buy Now action)
-    // NOTE: Replace CheckoutController with your actual controller if different
+    // 8. NEW: CHECKOUT ROUTE (Used by Buy Now action)
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
 
-    // 1. Checkout Page Display Karna (GET)
-    // Yeh route 'frontend.checkout.index' view ko load karega
+    // 9. Checkout Page Display Karna (GET)
     Route::get('/checkout', [App\Http\Controllers\Frontend\CheckoutController::class, 'index'])
         ->name('checkout.index');
 
-    // 2. Order Process Karna (POST)
-    // Yeh route form submission ko handle karega
+    // 10. Order Process Karna (POST)
     Route::post('/checkout/process', [App\Http\Controllers\Frontend\CheckoutController::class, 'process'])
         ->name('checkout.process');
-
-    // Address Store Route ko Frontend\AddressController par point karein
-    // Route::post('/user/address', [AddressController::class, 'store'])->name('user.address.store');
-    // Address Store
     Route::post('/user/address', [AddressController::class, 'store'])->name('user.address.store');
 
     Route::put('/user/address/{id}', [AddressController::class, 'update'])->name('user.address.update');
 
     Route::delete('/user/address/{id}', [AddressController::class, 'destroy'])->name('user.address.delete');
 
-    // 1. ✅ PRIMARY LISTING ROUTE: "My Orders" will show the list of all invoices
     Route::get('/account/my-orders', [AccountController::class, 'invoicesIndex'])
         ->name('orders.index');
 
-    // 2. Invoice Detail Route: (This is essential for the 'View Invoice' button)
     Route::get('/invoice/{order_id}', [AccountController::class, 'showInvoice'])
         ->name('invoice.show');
     Route::get('/account', [App\Http\Controllers\Frontend\AccountController::class, 'index'])
@@ -172,13 +135,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/account/forgot-password/check', [ForgotController::class, 'checkUser'])->name('custom.forgot.check');
     Route::get('/account/reset-password/{id}', [ForgotController::class, 'showResetForm'])->name('custom.reset');
     Route::post('/account/reset-password/{id}', [ForgotController::class, 'resetPassword'])->name('custom.reset.save');
-    // Contact Page
     Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 
-    // Contact Form Submit
     Route::post('/contact/send', [ContactController::class, 'store'])->name('contact.store');
     Route::get('/about', [AboutController::class, 'index'])->name('about');
-    // FRONTEND PRODUCT DETAIL PAGE
     Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show');
     Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 });

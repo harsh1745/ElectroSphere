@@ -9,13 +9,11 @@ use Illuminate\Support\Facades\Hash;
 
 class ForgotController extends Controller
 {
-    // SHOW EMAIL + DOB PAGE
     public function showForm()
     {
         return view('frontend.auth.custom-forgot');
     }
 
-    // VERIFY USER
     public function checkUser(Request $request)
     {
         $request->validate([
@@ -35,14 +33,12 @@ class ForgotController extends Controller
     }
 
 
-    // SHOW RESET PASSWORD FORM
     public function showResetForm($id)
     {
         $user = User::findOrFail($id);
         return view('frontend.auth.custom-reset', compact('user'));
     }
 
-    // SAVE NEW PASSWORD AND RETURN TO PROFILE
     public function resetPassword(Request $request, $id)
     {
         if ($request->password !== $request->password_confirmation) {

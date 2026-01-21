@@ -15,7 +15,6 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
 {
-    // ✅ Selected year (dropdown se aayega)
     $selectedYear = $request->get('year', now()->year);
 
     // =======================

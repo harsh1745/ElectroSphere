@@ -7,7 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Product;
-use App\Models\Wishlist; // Yeh Model use ho raha hai
+use App\Models\Wishlist;
 
 class WishlistController extends Controller
 {
@@ -17,7 +17,6 @@ class WishlistController extends Controller
             return redirect()->route('login');
         }
 
-        // ✅ FIX 1: Missing Product/Slug error ke liye has('product') filter zaroori hai
         $wishlistItems = Wishlist::where('user_id', Auth::id())
             ->has('product')
             ->with('product')
@@ -38,16 +37,13 @@ class WishlistController extends Controller
             ->latest()
             ->get();
 
-        // Total calculate karo (Optional, for Subtotal display)
         $subtotal = $wishlistItems->sum(function ($item) {
             return $item->product ? $item->product->price : 0;
         });
 
-        // Sirf partial view return karo
-// ✅ Output must be rendered HTML string
-    return view('frontend.wishlist._drawer_content', compact('wishlistItems', 'subtotal'))->render();    }
+    return view('frontend.wishlist._drawer_content', compact('wishlistItems', 'subtotal'))->render();
+    }
 
-    // 🧡 Toggle Wishlist
     public function toggle(Request $request, $productId)
     {
         if (!Auth::check()) {
@@ -77,7 +73,6 @@ class WishlistController extends Controller
         ]);
     }
 
-    // ✅ Static Method for Navbar Count
     public static function getWishlistCount()
     {
         if (!Auth::check()) return 0;

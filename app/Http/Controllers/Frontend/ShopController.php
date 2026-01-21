@@ -8,7 +8,6 @@ use App\Models\Product;
 use App\Models\Category;
 use App\Models\Review;
 use Illuminate\Support\Str;
-// ✅ Yeh do (2) imports zaroori hain Wishlist check ke liye
 use App\Models\Wishlist;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,24 +18,20 @@ class ShopController extends Controller
     $categories = Category::all();
     $productsQuery = Product::query();
 
-    // 🔒 SAME RANDOM ORDER FOR PAGINATION
     $seed = session()->get('shop_random_seed');
     if (!$seed) {
         $seed = rand(1, 100000);
         session()->put('shop_random_seed', $seed);
     }
 
-    // Get filters
     $currentCategory = $request->input('category');
     $minPrice = $request->input('min_price');
     $maxPrice = $request->input('max_price');
 
-    // 🧩 Category filter
     if (!empty($currentCategory) && $currentCategory !== 'all') {
         $productsQuery->where('category_id', $currentCategory);
     }
 
-    // 🧩 Price Range filter
     if (!empty($minPrice)) {
         $productsQuery->where('price', '>=', $minPrice);
     }
@@ -45,16 +40,13 @@ class ShopController extends Controller
         $productsQuery->where('price', '<=', $maxPrice);
     }
 
-    // 🧩 ONLY AVAILABLE PRODUCTS
     $productsQuery->where('stock', '>', 0);
 
-    // 🎲 RANDOM ORDER (STABLE)
     $products = $productsQuery
         ->orderByRaw("RAND($seed)")
         ->paginate(12)
         ->withQueryString();
 
-    // 🧩 Min & Max price for filter UI
     $priceRange = [
         'min' => Product::min('price'),
         'max' => Product::max('price'),
@@ -97,14 +89,11 @@ class ShopController extends Controller
                 ->exists();
         }
 
-        // ⭐ REAL SOLD COUNT — FROM order_details TABLE
         $soldCount = \App\Models\OrderDetail::where('product_id', $product->id)
             ->sum('quantity');
 
-        // ⭐ Rating — Calculate average rating from reviews
         $rating = $reviews->avg('rating') ?? 0;
 
-        // Manufacturer
         $manufacturerDetails = $product->manufacturer ?? "Manufacturer info not available.";
 
         return view('frontend.shop.show', compact(

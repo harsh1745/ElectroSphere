@@ -33,7 +33,6 @@ class OrderController extends Controller
 
         $newStatus = $request->status;
 
-        // --- CASE 1: COMPLETED → DEDUCT STOCK + PAYMENT PAID
         if ($newStatus === 'completed' && $order->status !== 'completed') {
 
             DB::beginTransaction();
@@ -64,7 +63,6 @@ class OrderController extends Controller
             }
         }
 
-        // --- CASE 2: CANCELLED
         if ($newStatus === 'cancelled') {
             $order->update([
                 'status' => 'cancelled',
@@ -74,7 +72,6 @@ class OrderController extends Controller
             return back()->with('success', 'Order cancelled!');
         }
 
-        // --- CASE 3: REFUNDED
         if ($newStatus === 'refunded') {
             $order->update([
                 'status' => 'refunded',
@@ -84,8 +81,6 @@ class OrderController extends Controller
             return back()->with('success', 'Order refunded!');
         }
 
-
-        // --- CASE 4: Pending / Processing / Shipped
         $order->update([
             'status' => $newStatus,
             'payment_status' => $order->payment_status ?? 'pending'

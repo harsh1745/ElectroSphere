@@ -9,10 +9,8 @@ class Wishlist extends Model
 {
     use HasFactory;
 
-    // Table ka naam 'wishlists'
     protected $table = 'wishlists';
 
-    // Mass assignable fields
     protected $fillable = [
         'user_id',
         'product_id',

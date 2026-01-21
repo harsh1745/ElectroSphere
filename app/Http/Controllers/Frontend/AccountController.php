@@ -10,33 +10,17 @@ use Illuminate\Support\Facades\Hash;
 
 class AccountController extends Controller
 {
-    /**
-     * ============================
-     * MY ACCOUNT (VIEW PROFILE)
-     * ============================
-     */
     public function index()
     {
         $user = Auth::user();
         return view('frontend.account.user.index', compact('user'));
     }
 
-    /**
-     * ============================
-     * EDIT PROFILE FORM
-     * ============================
-     */
     public function edit()
     {
         $user = Auth::user();
         return view('frontend.account.user.edit', compact('user'));
     }
-
-    /**
-     * ============================
-     * UPDATE PROFILE
-     * ============================
-     */
 
     public function update(Request $request)
     {
@@ -62,14 +46,12 @@ class AccountController extends Controller
                 'password' => 'required|min:6|confirmed',
             ]);
 
-            // Check if old password is correct
             if (!Hash::check($request->current_password, $user->password)) {
                 return back()->withErrors([
                     'current_password' => 'Your current password is incorrect.',
                 ]);
             }
 
-            // Save new password
             $user->password = bcrypt($request->password);
         }
 
@@ -78,13 +60,6 @@ class AccountController extends Controller
         return redirect()->route('account')->with('success', 'Profile updated successfully!');
     }
 
-
-
-    /**
-     * ============================
-     * USER INVOICES LIST
-     * ============================
-     */
     public function invoicesIndex()
     {
         $userId = Auth::id();
@@ -95,12 +70,6 @@ class AccountController extends Controller
 
         return view('frontend.account.invoices.index', compact('invoices'));
     }
-
-    /**
-     * ============================
-     * SHOW SINGLE INVOICE
-     * ============================
-     */
     public function showInvoice($order_id)
     {
         $order = Order::where('id', $order_id)
